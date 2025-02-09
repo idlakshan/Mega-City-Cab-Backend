@@ -1,6 +1,7 @@
 package com.mcc.backend.entity;
 
 public class Category {
+    private int id;
     private String name;
     private String icon;
     private String title;
@@ -16,6 +17,23 @@ public class Category {
         this.title = title;
         this.features = features;
         this.price = price;
+    }
+
+    public Category(int id, String name, String icon, String title, String features, double price) {
+        this.id = id;
+        this.name = name;
+        this.icon = icon;
+        this.title = title;
+        this.features = features;
+        this.price = price;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
