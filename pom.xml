@@ -18,6 +18,7 @@
     </properties>
 
     <dependencies>
+        <!-- Java Servlet API for web applications (provided by the server, e.g., Tomcat) -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -37,16 +38,25 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- GlassFish JSON Processing API for handling JSON data -->
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
             <version>1.1.4</version>
         </dependency>
 
+        <!-- MySQL JDBC driver for database connectivity -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
+        </dependency>
+
+        <!-- Java JWT (JSON Web Token) library for handling authentication tokens -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
         </dependency>
 
 
