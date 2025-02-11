@@ -133,6 +133,36 @@ public class Security {
         return null;
     }
 
+    public static Jws<Claims> isValidJWT(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        JsonObjectBuilder response = Json.createObjectBuilder();
+        PrintWriter writer = resp.getWriter();
+        try {
+            String authHeader = req.getHeader("Authorization");
+            resp.setContentType("application/json");
+
+            if (authHeader != null) {
+                String token = authHeader.substring(7);
+                return Jwts.parser().setSigningKey(SECRET_KEY.getBytes()).parseClaimsJws(token);
+            }
+
+            response.add("message", "Unauthorized Request");
+            response.add("code", 403);
+            resp.setStatus(403);
+
+            writer.print(response.build());
+            writer.close();
+            return null;
+        } catch (Exception e) {
+            response.add("message", "Unauthorized Request");
+            response.add("code", 403);
+            resp.setStatus(403);
+
+            writer.print(response.build());
+            writer.close();
+            return null;
+        }
+    }
+
     public static Jws<Claims> getIDFromJWT(String jwt) {
         return Jwts.parser().setSigningKey(SECRET_KEY.getBytes()).parseClaimsJws(jwt);
     }

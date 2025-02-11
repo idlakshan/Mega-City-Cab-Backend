@@ -10,4 +10,7 @@ public interface AuthBO{
     String login(String email, String password) throws SQLException, ClassNotFoundException;
 
     boolean signUp(UserDTO user) throws SQLException, ClassNotFoundException;
+
+    UserDTO getUserById(int userId) throws SQLException, ClassNotFoundException;
+
 }

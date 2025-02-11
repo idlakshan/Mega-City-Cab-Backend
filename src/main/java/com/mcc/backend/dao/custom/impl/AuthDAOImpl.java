@@ -83,4 +83,21 @@ public class AuthDAOImpl implements AuthDAO {
             }
         }
     }
+
+    @Override
+    public User findUserById(Connection connection, int userId) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("SELECT name, email, phone FROM user WHERE id = ?")) {
+            statement.setInt(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    User user = new User();
+                    user.setName(resultSet.getString("name"));
+                    user.setEmail(resultSet.getString("email"));
+                    user.setPhone(resultSet.getString("phone"));
+                    return user;
+                }
+                return null;
+            }
+        }
+    }
 }

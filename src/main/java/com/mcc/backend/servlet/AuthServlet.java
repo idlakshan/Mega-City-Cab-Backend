@@ -2,7 +2,10 @@ package com.mcc.backend.servlet;
 
 import com.mcc.backend.bo.custom.AuthBO;
 import com.mcc.backend.bo.custom.impl.AuthBOImpl;
+import com.mcc.backend.config.Security;
 import com.mcc.backend.dto.UserDTO;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 
 import javax.annotation.Resource;
 import javax.json.Json;
@@ -74,6 +77,37 @@ public class AuthServlet extends HttpServlet {
             } catch (SQLException | ClassNotFoundException e) {
                 throw new ServletException("Registration failed", e);
             }
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = request.getPathInfo();
+
+        if (path.equals("/current-user")) {
+            try {
+                Jws<Claims> claims = Security.isValidJWT(request, response);
+                if (claims != null) {
+                    int userId = (int) claims.getBody().get("userId");
+                    UserDTO userDTO = authBO.getUserById(userId);
+                    if (userDTO != null) {
+                        response.setContentType("application/json");
+                        response.getWriter().write(Json.createObjectBuilder()
+                                .add("name", userDTO.getName())
+                                .add("email", userDTO.getEmail())
+                                .add("phone", userDTO.getPhone())
+                                .build().toString());
+                    } else {
+                        response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new ServletException("Failed to fetch user details", e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
         }
     }
 

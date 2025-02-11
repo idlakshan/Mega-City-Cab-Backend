@@ -93,4 +93,22 @@ public class AuthBOImpl implements AuthBO {
             }
         }
     }
+
+    @Override
+    public UserDTO getUserById(int userId) throws SQLException {
+        Connection connection = null;
+        try {
+            connection = AuthServlet.dataSource.getConnection();
+            User user = authDAO.findUserById(connection, userId);
+            UserDTO userDTO = new UserDTO();
+            userDTO.setName(user.getName());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setPhone(user.getPhone());
+            return userDTO;
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
 }

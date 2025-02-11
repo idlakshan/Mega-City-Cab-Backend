@@ -1,5 +1,6 @@
 package com.mcc.backend.dao.custom;
 
+import com.mcc.backend.dto.UserDTO;
 import com.mcc.backend.entity.User;
 
 import java.sql.Connection;
@@ -11,4 +12,5 @@ public interface AuthDAO {
     int saveUser(Connection connection, User user) throws SQLException;
     void saveUserDetails(Connection connection, int userId, int roleId) throws SQLException;
     int findRoleIdByName(Connection connection, String roleName) throws SQLException;
+    User findUserById(Connection connection, int userId) throws SQLException;
 }
