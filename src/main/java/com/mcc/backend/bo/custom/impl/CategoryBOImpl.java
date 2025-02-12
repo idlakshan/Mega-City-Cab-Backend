@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CategoryBOImpl implements CategoryBO {
@@ -37,6 +38,22 @@ public class CategoryBOImpl implements CategoryBO {
             }
         }
 
+        return categoryDTOs;
+    }
+
+
+    @Override
+    public List<CategoryDTO> getAllCategoryNames() throws SQLException {
+        List<CategoryDTO> categoryDTOs = new ArrayList<>();
+        try (Connection connection = CategoryServlet.dataSource.getConnection()) {
+            List<Category> categories = categoryDAO.getAllCategoryNames(connection);
+
+            for (Category category : categories) {
+                CategoryDTO categoryDTO = new CategoryDTO();
+                categoryDTO.setName(category.getName());
+                categoryDTOs.add(categoryDTO);
+            }
+        }
         return categoryDTOs;
     }
 }

@@ -34,4 +34,22 @@ public class CategoryDAOImpl implements CategoryDAO {
 
         return categories;
     }
+
+    @Override
+    public List<Category> getAllCategoryNames(Connection connection) throws SQLException {
+        List<Category> categories = new ArrayList<>();
+        String query = "SELECT name FROM category"; // Adjust the query based on your table structure
+
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Category category = new Category();
+                category.setName(resultSet.getString("name"));
+                categories.add(category);
+            }
+        }
+
+        return categories;
+    }
 }
