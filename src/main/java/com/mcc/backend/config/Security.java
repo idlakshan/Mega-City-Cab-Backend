@@ -97,7 +97,7 @@ public class Security {
                 String token = authHeader.substring(7); // Remove "Bearer " prefix
                 //System.out.println("Token "+token);
                 Jws<Claims> claimsJws = Jwts.parser().setSigningKey(SECRET_KEY.getBytes()).parseClaimsJws(token);
-               // System.out.println("claims "+claimsJws);
+                // System.out.println("claims "+claimsJws);
                 Jws<Claims> claims = getIDFromJWT(token);
 
                 Object role = claims.getBody().get("role");

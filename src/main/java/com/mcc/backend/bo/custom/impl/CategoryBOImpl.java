@@ -10,11 +10,9 @@ import com.mcc.backend.dto.CategoryDTO;
 import com.mcc.backend.entity.Category;
 import com.mcc.backend.servlet.CategoryServlet;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CategoryBOImpl implements CategoryBO {
