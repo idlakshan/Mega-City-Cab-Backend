@@ -38,13 +38,14 @@ public class CategoryDAOImpl implements CategoryDAO {
     @Override
     public List<Category> getAllCategoryNames(Connection connection) throws SQLException {
         List<Category> categories = new ArrayList<>();
-        String query = "SELECT name FROM category"; // Adjust the query based on your table structure
+        String query = "SELECT id,name FROM category";
 
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
                 Category category = new Category();
+                category.setId(resultSet.getInt("id"));
                 category.setName(resultSet.getString("name"));
                 categories.add(category);
             }

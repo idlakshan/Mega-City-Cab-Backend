@@ -1,33 +1,102 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.custom.CarBO;
+import com.mcc.backend.bo.custom.impl.CarBOImpl;
 import com.mcc.backend.config.Security;
+import com.mcc.backend.dto.CarDTO;
+import com.mcc.backend.entity.Car;
+import com.mcc.backend.util.ResponseUtil;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 
+import javax.annotation.Resource;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.SQLException;
 import java.util.Objects;
 
-
 @WebServlet(urlPatterns = "/vehicle")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 50)
 public class VehicleServlet extends HttpServlet {
 
-    @Override
+    @Resource(name = "java:comp/env/db/pool")
+    public static DataSource dataSource;
+
+    private final CarBO carBO = new CarBOImpl();
+
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        System.out.println("Authorization Header: " + req.getHeader("Authorization")); // Debug log
-        Jws<Claims> validAdminJWT = Security.isValidAdminJWT(req, resp);
+        Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
 
-        if (!Objects.equals(validAdminJWT, null)) {
+        if (claims != null) {
+            int categoryId;
+            String categoryIdStr = req.getParameter("categoryId");
+            String carName = req.getParameter("carName");
+            String carNumber = req.getParameter("carNumber");
 
-            Object role = validAdminJWT.getBody().get("role");
-            resp.getWriter().println("Admin Works");
+            if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "categoryId is required");
+                return;
+            }
 
-            System.out.println(role);
+            try {
+                categoryId = Integer.parseInt(categoryIdStr);
+            } catch (NumberFormatException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "Invalid categoryId format");
+                return;
+            }
+
+            Part filePart = req.getPart("carImage");
+            if (filePart == null || filePart.getSize() <= 0) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "No file uploaded");
+                return;
+            }
+
+            String rootPath = "D:/Projects/ICBT/Mega City Cab/Backend";
+            String uploadDir = rootPath + File.separator + "uploads/vehicles";
+            File uploadFolder = new File(uploadDir);
+            if (!uploadFolder.exists()) {
+                uploadFolder.mkdir();
+            }
+
+            String imageFileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+            File file = new File(uploadDir, imageFileName);
+            Files.copy(filePart.getInputStream(), file.toPath());
+
+            CarDTO dto = new CarDTO();
+            dto.setCategoryId(categoryId);
+            dto.setCarName(carName);
+            dto.setCarNumber(carNumber);
+            dto.setCarImage(imageFileName);
+
+            try {
+                carBO.saveCar(dto);
+                JsonObject data = Json.createObjectBuilder().add("carNumber", dto.getCarNumber()).build();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Car saved successfully", data, null);
+            } catch (SQLException e) {
+                if (e.getMessage().contains("Car number already exists")) {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_CONFLICT, "Duplicate entry", null, "Car number already exists");
+                } else {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
+                }
+            } catch (ClassNotFoundException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Class not found", null, e.getMessage());
+            }
+        } else {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized access", null, "Only ADMIN users can add vehicles.");
         }
     }
-
 }

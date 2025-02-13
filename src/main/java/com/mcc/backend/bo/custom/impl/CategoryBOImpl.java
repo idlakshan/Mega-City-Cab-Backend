@@ -19,7 +19,7 @@ public class CategoryBOImpl implements CategoryBO {
     private final CategoryDAO categoryDAO = new CategoryDAOImpl();
 
     @Override
-    public List<CategoryDTO> getAllCategories() throws SQLException {
+    public List<CategoryDTO> getAllCategories(){
         List<CategoryDTO> categoryDTOs = new ArrayList<>();
 
         try (Connection connection = CategoryServlet.dataSource.getConnection()) {
@@ -34,6 +34,8 @@ public class CategoryBOImpl implements CategoryBO {
                 categoryDTO.setPrice(category.getPrice());
                 categoryDTOs.add(categoryDTO);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
 
         return categoryDTOs;
@@ -48,6 +50,7 @@ public class CategoryBOImpl implements CategoryBO {
 
             for (Category category : categories) {
                 CategoryDTO categoryDTO = new CategoryDTO();
+                categoryDTO.setId(category.getId());
                 categoryDTO.setName(category.getName());
                 categoryDTOs.add(categoryDTO);
             }
