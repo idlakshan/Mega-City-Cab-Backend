@@ -10,5 +10,6 @@ public interface CarDAO {
     boolean isCarNumberExists(String carNumber) throws SQLException;
     void saveCar(Car car) throws SQLException;
     List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException;
+    boolean deleteCar(int carId) throws SQLException, ClassNotFoundException;
 
 }

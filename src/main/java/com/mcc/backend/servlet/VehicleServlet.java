@@ -29,7 +29,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-@WebServlet(urlPatterns = "/vehicle")
+@WebServlet(urlPatterns = "/vehicle/*")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
         maxFileSize = 1024 * 1024 * 10,
         maxRequestSize = 1024 * 1024 * 50)
@@ -137,4 +137,36 @@ public class VehicleServlet extends HttpServlet {
             ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized access", null, "You do not have permission to access this resource.");
         }
     }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String pathInfo = req.getPathInfo();
+
+        if (pathInfo == null || pathInfo.equals("/")) {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing car ID", null, "Car ID is required.");
+            return;
+        }
+
+        int carId;
+        try {
+            carId = Integer.parseInt(pathInfo.substring(1));
+        } catch (NumberFormatException e) {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid car ID format", null, "Car ID must be a number.");
+            return;
+        }
+
+        try {
+            boolean deleted = carBO.deleteCar(carId);
+            if (deleted) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Car deleted successfully", null, null);
+            } else {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_NOT_FOUND, "Car not found", null, "No car found with ID: " + carId);
+            }
+        } catch (SQLException e) {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error occurred", null, e.getMessage());
+        } catch (ClassNotFoundException e) {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error occurred", null, e.getMessage());
+        }
+    }
+
 }

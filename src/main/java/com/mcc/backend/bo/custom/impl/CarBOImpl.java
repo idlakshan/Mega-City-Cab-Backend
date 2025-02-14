@@ -32,4 +32,11 @@ public class CarBOImpl implements CarBO {
     public List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException {
         return carDAO.getAllVehicles();
     }
+
+    @Override
+    public boolean deleteCar(int carId) throws SQLException, ClassNotFoundException {
+        return carDAO.deleteCar(carId);
+    }
+
+
 }

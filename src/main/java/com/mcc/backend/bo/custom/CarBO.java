@@ -10,5 +10,6 @@ public interface CarBO {
 
    void saveCar(CarDTO car) throws SQLException, ClassNotFoundException;
    List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException;
+   boolean deleteCar(int carId) throws SQLException, ClassNotFoundException;
 
 }

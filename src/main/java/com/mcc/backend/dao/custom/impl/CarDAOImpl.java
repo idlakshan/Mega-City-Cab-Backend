@@ -63,4 +63,17 @@ public class CarDAOImpl implements CarDAO {
         }
         return vehicles;
     }
+
+    @Override
+    public boolean deleteCar(int carId) throws SQLException, ClassNotFoundException {
+        String query = "DELETE FROM car WHERE car_id = ?";
+
+        try (Connection conn = VehicleServlet.dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, carId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
 }
