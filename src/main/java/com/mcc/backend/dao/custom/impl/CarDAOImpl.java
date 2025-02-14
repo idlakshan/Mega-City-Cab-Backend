@@ -1,10 +1,14 @@
 package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.CarDAO;
+import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
 import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CarDAOImpl implements CarDAO {
 
@@ -37,5 +41,26 @@ public class CarDAOImpl implements CarDAO {
         } catch (SQLException e) {
             throw new SQLException("Error saving car to database", e);
         }
+    }
+
+    @Override
+    public List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException {
+        String sql = "SELECT * FROM car";
+        List<CarDTO> vehicles = new ArrayList<>();
+        try (Connection connection = VehicleServlet.dataSource.getConnection();
+             PreparedStatement pstm = connection.prepareStatement(sql);
+             ResultSet rs = pstm.executeQuery()) {
+            while (rs.next()) {
+                CarDTO car = new CarDTO();
+                car.setCarId(rs.getInt("car_id"));
+                car.setCategoryId(rs.getInt("category_id"));
+                car.setCarName(rs.getString("car_name"));
+                car.setCarNumber(rs.getString("car_number"));
+                car.setCarImage(rs.getString("car_image"));
+                car.setStatus(rs.getString("status"));
+                vehicles.add(car);
+            }
+        }
+        return vehicles;
     }
 }

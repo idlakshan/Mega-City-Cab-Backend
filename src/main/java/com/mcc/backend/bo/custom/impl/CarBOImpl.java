@@ -7,6 +7,7 @@ import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class CarBOImpl implements CarBO {
 
@@ -25,5 +26,10 @@ public class CarBOImpl implements CarBO {
         car.setCarImage(dto.getCarImage());
 
         carDAO.saveCar(car);
+    }
+
+    @Override
+    public List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException {
+        return carDAO.getAllVehicles();
     }
 }

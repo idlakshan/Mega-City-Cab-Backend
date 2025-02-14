@@ -27,6 +27,7 @@ public class CategoryBOImpl implements CategoryBO {
 
             for (Category category : categories) {
                 CategoryDTO categoryDTO = new CategoryDTO();
+                categoryDTO.setId(category.getId());
                 categoryDTO.setName(category.getName());
                 categoryDTO.setIcon(category.getIcon());
                 categoryDTO.setTitle(category.getTitle());

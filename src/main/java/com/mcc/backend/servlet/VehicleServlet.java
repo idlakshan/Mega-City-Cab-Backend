@@ -12,6 +12,7 @@ import io.jsonwebtoken.Jws;
 
 import javax.annotation.Resource;
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
 
 @WebServlet(urlPatterns = "/vehicle")
@@ -38,6 +40,7 @@ public class VehicleServlet extends HttpServlet {
 
     private final CarBO carBO = new CarBOImpl();
 
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
 
@@ -97,6 +100,41 @@ public class VehicleServlet extends HttpServlet {
             }
         } else {
             ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized access", null, "Only ADMIN users can add vehicles.");
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        if (Security.isValidAdminJWT(req, resp) != null) {
+            try {
+
+                List<CarDTO> vehicles = carBO.getAllVehicles();
+
+
+
+                JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+                for (CarDTO vehicle : vehicles) {
+                    JsonObject vehicleJson = Json.createObjectBuilder()
+                            .add("id", vehicle.getCarId())
+                            .add("categoryId", vehicle.getCategoryId())
+                            .add("carName", vehicle.getCarName())
+                            .add("carNumber", vehicle.getCarNumber())
+                            .add("carImage", vehicle.getCarImage())
+                            .add("status", vehicle.getStatus())
+                            .build();
+                    jsonArrayBuilder.add(vehicleJson);
+                }
+
+                JsonObject data = Json.createObjectBuilder().add("vehicles", jsonArrayBuilder).build();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Vehicles retrieved successfully", data, null);
+            } catch (SQLException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
+            } catch (ClassNotFoundException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Class not found", null, e.getMessage());
+            }
+        } else {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized access", null, "You do not have permission to access this resource.");
         }
     }
 }

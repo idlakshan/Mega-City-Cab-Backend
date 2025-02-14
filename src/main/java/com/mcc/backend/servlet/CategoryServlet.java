@@ -40,6 +40,7 @@ public class CategoryServlet extends HttpServlet {
 
                     for (CategoryDTO category : categories) {
                         jsonArrayBuilder.add(Json.createObjectBuilder()
+                                .add("id", category.getId())
                                 .add("name", category.getName())
                                 .add("icon", category.getIcon())
                                 .add("title", category.getTitle())
