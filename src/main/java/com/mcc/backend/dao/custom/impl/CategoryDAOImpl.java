@@ -53,4 +53,19 @@ public class CategoryDAOImpl implements CategoryDAO {
 
         return categories;
     }
+
+    @Override
+    public boolean updateCategoryPrice(Connection connection, int id, double newPrice) throws SQLException {
+        String query = "UPDATE category SET price = ? WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setDouble(1, newPrice);
+            statement.setInt(2, id);
+
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        }
+    }
+
+
 }

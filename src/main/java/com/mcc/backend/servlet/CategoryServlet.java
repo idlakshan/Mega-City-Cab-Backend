@@ -5,12 +5,11 @@ import com.mcc.backend.bo.custom.impl.CategoryBOImpl;
 import com.mcc.backend.config.Security;
 import com.mcc.backend.dto.CategoryDTO;
 import com.mcc.backend.util.ResponseUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 
 import javax.annotation.Resource;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -73,6 +72,46 @@ public class CategoryServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Jws<Claims> validAdminJWT = Security.isValidAdminJWT(req, resp);
+
+        if (validAdminJWT != null) {
+            try (JsonReader jsonReader = Json.createReader(req.getReader())) {
+                JsonObject jsonObject = jsonReader.readObject();
+
+                if (!jsonObject.containsKey("id") || !jsonObject.containsKey("price")) {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters: id, price", null, "Missing required parameters: id, price");
+                    return;
+                }
+                int id;
+                double newPrice;
+                try {
+                    id = jsonObject.getInt("id");
+                    newPrice = jsonObject.getJsonNumber("price").doubleValue();
+                } catch (Exception e) {ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters: id must be an integer, price must be a number", null, "Invalid parameters: id must be an integer, price must be a number");
+                    return;
+                }
+                try {
+                    boolean updated = categoryBO.updateCategoryPrice(id, newPrice);
+
+                    if (updated) {ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Category price updated successfully", Json.createObjectBuilder().add("id", id).add("price", newPrice).build(), null);
+                    } else {
+                        ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_NOT_FOUND, "Category not found with id: " + id, null, "Category not found with id: " + id);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update category price", null, e.getMessage());
+                }
+            } catch (Exception e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON format", null, e.getMessage());
+            }
+        } else {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid or missing JWT token", null, "Unauthorized: Invalid or missing JWT token"
+            );
         }
     }
 }

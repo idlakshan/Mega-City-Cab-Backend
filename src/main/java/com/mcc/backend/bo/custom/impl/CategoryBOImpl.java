@@ -58,4 +58,11 @@ public class CategoryBOImpl implements CategoryBO {
         }
         return categoryDTOs;
     }
+
+    @Override
+    public boolean updateCategoryPrice(int id, double newPrice) throws SQLException {
+        try (Connection connection = CategoryServlet.dataSource.getConnection()) {
+            return categoryDAO.updateCategoryPrice(connection, id, newPrice);
+        }
+    }
 }
