@@ -9,4 +9,6 @@ public interface DriverBO {
     boolean saveDriver(DriverDTO driver) throws SQLException, ClassNotFoundException;
     List<DriverDTO> getAllDrivers() throws SQLException, ClassNotFoundException;
     DriverDTO getDriverById(int driverId) throws SQLException, ClassNotFoundException;
+    boolean updateDriver(DriverDTO driver) throws SQLException, ClassNotFoundException;
+    boolean deleteDriver(int driverId) throws SQLException, ClassNotFoundException;
 }

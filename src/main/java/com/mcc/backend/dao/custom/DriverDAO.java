@@ -10,4 +10,6 @@ public interface DriverDAO {
     boolean saveDriver(Connection conn, Driver driver) throws SQLException, ClassNotFoundException;
     List<Driver> getAllDrivers(Connection conn) throws SQLException, ClassNotFoundException;
     Driver getDriverById(Connection conn, int driverId) throws SQLException, ClassNotFoundException;
+    boolean updateDriver(Connection conn, Driver driver) throws SQLException, ClassNotFoundException;
+    boolean deleteDriver(Connection conn, int driverId) throws SQLException, ClassNotFoundException;
 }

@@ -72,4 +72,28 @@ public class DriverBOImpl implements DriverBO {
             return null;
         }
     }
+
+    @Override
+    public boolean updateDriver(DriverDTO dto) throws SQLException, ClassNotFoundException {
+        try (Connection conn = DriverServlet.dataSource.getConnection()) {
+            Driver driver = new Driver();
+
+            driver.setDriverId(dto.getDriverId());
+            driver.setDriverName(dto.getDriverName());
+            driver.setDriverNic(dto.getDriverNic());
+            driver.setDriverAddress(dto.getDriverAddress());
+            driver.setDriverEmail(dto.getDriverEmail());
+            driver.setLicenseImage(dto.getLicenseImage());
+            driver.setDriverContact(dto.getDriverContact());
+            driver.setStatus(dto.getStatus());
+            return driverDAO.updateDriver(conn, driver);
+        }
+    }
+
+    @Override
+    public boolean deleteDriver(int driverId) throws SQLException, ClassNotFoundException {
+        try (Connection conn = DriverServlet.dataSource.getConnection()) {
+            return driverDAO.deleteDriver(conn, driverId);
+        }
+    }
 }

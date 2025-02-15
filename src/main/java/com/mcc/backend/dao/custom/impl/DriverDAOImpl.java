@@ -72,4 +72,33 @@ public class DriverDAOImpl implements DriverDAO {
         }
         return null;
     }
+
+    @Override
+    public boolean updateDriver(Connection conn, Driver driver) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE driver SET driver_name = ?, driver_nic = ?, driver_address = ?, driver_email = ?, license_image = ?, driver_contact = ?, status = ? WHERE driver_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, driver.getDriverName());
+            ps.setString(2, driver.getDriverNic());
+            ps.setString(3, driver.getDriverAddress());
+            ps.setString(4, driver.getDriverEmail());
+            ps.setString(5, driver.getLicenseImage());
+            ps.setString(6, driver.getDriverContact());
+            ps.setString(7, driver.getStatus());
+            ps.setInt(8, driver.getDriverId());
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        }
+    }
+
+    @Override
+    public boolean deleteDriver(Connection conn, int driverId) throws SQLException, ClassNotFoundException {
+        String sql = "DELETE FROM driver WHERE driver_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, driverId);
+
+            int rowsDeleted = ps.executeUpdate();
+            return rowsDeleted > 0;
+        }
+    }
 }

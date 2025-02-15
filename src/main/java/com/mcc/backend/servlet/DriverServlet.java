@@ -46,15 +46,12 @@ public class DriverServlet extends HttpServlet {
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request format.", null, "Request must be multipart/form-data.");
                 return;
             }
-
+            
             String driverName = req.getParameter("driverName");
             String driverNic = req.getParameter("driverNic");
             String driverAddress = req.getParameter("driverAddress");
             String driverEmail = req.getParameter("driverEmail");
             String driverContact = req.getParameter("driverContact");
-
-            System.out.println(driverName+" "+driverNic+" "+driverAddress+" "+driverEmail+" "+driverContact);
-
 
             if (driverName == null || driverName.trim().isEmpty() || driverNic == null || driverNic.trim().isEmpty() ||
                     driverAddress == null || driverAddress.trim().isEmpty() || driverContact == null || driverContact.trim().isEmpty()) {
@@ -79,6 +76,7 @@ public class DriverServlet extends HttpServlet {
                 Files.copy(filePart.getInputStream(), file.toPath());
             }
 
+
             DriverDTO driver = new DriverDTO();
             driver.setDriverName(driverName);
             driver.setDriverNic(driverNic);
@@ -100,7 +98,9 @@ public class DriverServlet extends HttpServlet {
                 } else {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save driver.", null, "Database error.");
                 }
-            } catch (ClassNotFoundException | SQLException e) {
+            } catch (SQLException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
+            } catch (ClassNotFoundException e) {
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Class not found", null, e.getMessage());
             }
         } else {
@@ -176,6 +176,133 @@ public class DriverServlet extends HttpServlet {
             } catch (SQLException | ClassNotFoundException e) {
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
             }
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
+
+        if (claims != null) {
+            if (!req.getContentType().startsWith("multipart/form-data")) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request format.", null, "Request must be multipart/form-data.");
+                return;
+            }
+
+            String driverIdStr = req.getParameter("driverId");
+            String driverName = req.getParameter("driverName");
+            String driverNic = req.getParameter("driverNic");
+            String driverAddress = req.getParameter("driverAddress");
+            String driverEmail = req.getParameter("driverEmail");
+            String driverContact = req.getParameter("driverContact");
+            String driverStatus = req.getParameter("driverStatus");
+
+            if (driverIdStr == null || driverIdStr.trim().isEmpty() || driverName == null || driverName.trim().isEmpty() ||
+                    driverNic == null || driverNic.trim().isEmpty() || driverAddress == null || driverAddress.trim().isEmpty() ||
+                    driverContact == null || driverContact.trim().isEmpty()) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "All fields are required.");
+                return;
+            }
+
+            int driverId;
+            try {
+                driverId = Integer.parseInt(driverIdStr);
+            } catch (NumberFormatException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "Invalid driver ID format.");
+                return;
+            }
+
+
+            Part filePart = req.getPart("licenseImage");
+            String licenseImageFileName = null;
+
+            if (filePart != null && filePart.getSize() > 0) {
+                String rootPath = "D:/Projects/ICBT/Mega City Cab/Backend";
+                String uploadDir = rootPath + File.separator + "uploads/driver";
+                File uploadFolder = new File(uploadDir);
+
+                if (!uploadFolder.exists()) {
+                    uploadFolder.mkdir();
+                }
+
+                licenseImageFileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+                File file = new File(uploadDir, licenseImageFileName);
+                Files.copy(filePart.getInputStream(), file.toPath());
+            }
+
+
+            DriverDTO driver = new DriverDTO();
+            driver.setDriverId(driverId);
+            driver.setDriverName(driverName);
+            driver.setDriverNic(driverNic);
+            driver.setDriverAddress(driverAddress);
+            driver.setDriverEmail(driverEmail);
+            driver.setDriverContact(driverContact);
+            driver.setLicenseImage(licenseImageFileName);
+            driver.setStatus(driverStatus);
+
+
+            try {
+                boolean isUpdated = driverBO.updateDriver(driver);
+                if (isUpdated) {
+                    JsonObject data = Json.createObjectBuilder()
+                            .add("driverId", driver.getDriverId())
+                            .add("driverName", driver.getDriverName())
+                            .add("driverContact", driver.getDriverContact())
+                            .build();
+
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Driver updated successfully!", data, null);
+                } else {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update driver.", null, "Database error.");
+                }
+            } catch (SQLException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
+            } catch (ClassNotFoundException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Class not found", null, e.getMessage());
+            }
+        } else {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized access", null, "Only ADMIN users can update drivers.");
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
+
+        if (claims != null) {
+            String driverIdStr = req.getParameter("driverId");
+
+            if (driverIdStr == null || driverIdStr.trim().isEmpty()) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "Driver ID is required.");
+                return;
+            }
+
+            int driverId;
+            try {
+                driverId = Integer.parseInt(driverIdStr);
+            } catch (NumberFormatException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "Invalid driver ID format.");
+                return;
+            }
+
+            try {
+                boolean isDeleted = driverBO.deleteDriver(driverId);
+                if (isDeleted) {
+                    JsonObject data = Json.createObjectBuilder()
+                            .add("driverId", driverId)
+                            .build();
+
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Driver deleted successfully!", data, null);
+                } else {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to delete driver.", null, "Database error.");
+                }
+            } catch (SQLException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error", null, e.getMessage());
+            } catch (ClassNotFoundException e) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Class not found", null, e.getMessage());
+            }
+        } else {
+            ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized access", null, "Only ADMIN users can delete drivers.");
         }
     }
 }
