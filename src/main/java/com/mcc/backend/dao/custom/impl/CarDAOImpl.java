@@ -76,4 +76,45 @@ public class CarDAOImpl implements CarDAO {
         }
     }
 
+    @Override
+    public CarDTO getVehicleById(int carId) throws SQLException {
+        String query = "SELECT * FROM car WHERE car_id = ?";
+        try (Connection connection = VehicleServlet.dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, carId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    CarDTO car = new CarDTO();
+                    car.setCarId(resultSet.getInt("car_id"));
+                    car.setCategoryId(resultSet.getInt("category_id"));
+                    car.setCarName(resultSet.getString("car_name"));
+                    car.setCarNumber(resultSet.getString("car_number"));
+                    car.setCarImage(resultSet.getString("car_image"));
+                    car.setStatus(resultSet.getString("status"));
+                    return car;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean updateVehicle(Car car) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE car SET category_id = ?, car_name = ?, car_number = ?, car_image = ?, status = ? WHERE car_id = ?";
+        try (Connection conn = VehicleServlet.dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, car.getCategoryId());
+            ps.setString(2, car.getCarName());
+            ps.setString(3, car.getCarNumber());
+            ps.setString(4, car.getCarImage());
+            ps.setString(5, car.getStatus());
+            ps.setInt(6, car.getCarId());
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

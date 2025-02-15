@@ -38,5 +38,22 @@ public class CarBOImpl implements CarBO {
         return carDAO.deleteCar(carId);
     }
 
+    @Override
+    public CarDTO getVehicleById(int carId) throws SQLException, ClassNotFoundException {
+        return carDAO.getVehicleById(carId);
+    }
+
+    @Override
+    public boolean updateVehicle(CarDTO dto) throws SQLException, ClassNotFoundException {
+        Car car=new Car();
+        car.setCategoryId(dto.getCategoryId());
+        car.setCarName(dto.getCarName());
+        car.setCarNumber(dto.getCarNumber());
+        car.setCarImage(dto.getCarImage());
+        car.setStatus(dto.getStatus());
+        car.setCarId(dto.getCarId());
+        return carDAO.updateVehicle(car);
+    }
+
 
 }

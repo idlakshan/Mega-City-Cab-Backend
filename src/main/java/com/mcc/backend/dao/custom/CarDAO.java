@@ -11,5 +11,6 @@ public interface CarDAO {
     void saveCar(Car car) throws SQLException;
     List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException;
     boolean deleteCar(int carId) throws SQLException, ClassNotFoundException;
-
+    CarDTO getVehicleById(int carId) throws SQLException, ClassNotFoundException;
+    boolean updateVehicle(Car car)throws SQLException, ClassNotFoundException;
 }
