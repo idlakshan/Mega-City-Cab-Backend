@@ -66,7 +66,6 @@ public class CarBOImpl implements CarBO {
         try (Connection conn = VehicleServlet.dataSource.getConnection()) {
             Car car = carDAO.getVehicleById(conn, carId);
 
-
             if (car != null) {
                 CarDTO dto = new CarDTO();
                 dto.setCarId(car.getCarId());
@@ -95,4 +94,6 @@ public class CarBOImpl implements CarBO {
             return carDAO.updateVehicle(conn, car);
         }
     }
+
+
 }

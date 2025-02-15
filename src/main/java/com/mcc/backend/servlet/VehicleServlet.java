@@ -212,7 +212,7 @@ public class VehicleServlet extends HttpServlet {
 
             int id;
             int categoryId;
-            String idStr = req.getParameter("carId"); // Ensure this matches the client
+            String idStr = req.getParameter("carId");
             String categoryIdStr = req.getParameter("categoryId");
             String carName = req.getParameter("carName");
 //            String province = req.getParameter("province");

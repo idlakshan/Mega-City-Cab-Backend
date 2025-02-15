@@ -1,67 +1,67 @@
 package com.mcc.backend.dto;
 
 public class DriverDTO {
-    private int driverId;
-    private String name;
-    private String address;
-    private String email;
-    private String licenseNumber;
+    private Integer driverId;
+    private String driverName;
+    private String driverNic;
+    private String driverAddress;
+    private String driverEmail;
     private String licenseImage;
-    private String contactNumber;
+    private String driverContact;
     private String status;
 
     public DriverDTO() {
     }
 
-    public DriverDTO(int driverId, String name, String address, String email, String licenseNumber, String licenseImage, String contactNumber, String status) {
+    public DriverDTO(Integer driverId, String driverName, String driverNic, String driverAddress, String driverEmail, String licenseImage, String driverContact, String status) {
         this.driverId = driverId;
-        this.name = name;
-        this.address = address;
-        this.email = email;
-        this.licenseNumber = licenseNumber;
+        this.driverName = driverName;
+        this.driverNic = driverNic;
+        this.driverAddress = driverAddress;
+        this.driverEmail = driverEmail;
         this.licenseImage = licenseImage;
-        this.contactNumber = contactNumber;
+        this.driverContact = driverContact;
         this.status = status;
     }
 
-    public int getDriverId() {
+    public Integer getDriverId() {
         return driverId;
     }
 
-    public void setDriverId(int driverId) {
+    public void setDriverId(Integer driverId) {
         this.driverId = driverId;
     }
 
-    public String getName() {
-        return name;
+    public String getDriverName() {
+        return driverName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
     }
 
-    public String getAddress() {
-        return address;
+    public String getDriverNic() {
+        return driverNic;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setDriverNic(String driverNic) {
+        this.driverNic = driverNic;
     }
 
-    public String getEmail() {
-        return email;
+    public String getDriverAddress() {
+        return driverAddress;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setDriverAddress(String driverAddress) {
+        this.driverAddress = driverAddress;
     }
 
-    public String getLicenseNumber() {
-        return licenseNumber;
+    public String getDriverEmail() {
+        return driverEmail;
     }
 
-    public void setLicenseNumber(String licenseNumber) {
-        this.licenseNumber = licenseNumber;
+    public void setDriverEmail(String driverEmail) {
+        this.driverEmail = driverEmail;
     }
 
     public String getLicenseImage() {
@@ -72,12 +72,12 @@ public class DriverDTO {
         this.licenseImage = licenseImage;
     }
 
-    public String getContactNumber() {
-        return contactNumber;
+    public String getDriverContact() {
+        return driverContact;
     }
 
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
+    public void setDriverContact(String driverContact) {
+        this.driverContact = driverContact;
     }
 
     public String getStatus() {
