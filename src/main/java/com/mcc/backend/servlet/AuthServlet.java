@@ -70,9 +70,23 @@ public class AuthServlet extends HttpServlet {
 
             try {
                 if (authBO.signUp(user)) {
-                    response.getWriter().write("User registered successfully");
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                            Json.createObjectBuilder()
+                                    .add("status", "success")
+                                    .add("message", "User registered successfully")
+                                    .build()
+                                    .toString()
+                    );
                 } else {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Registration failed");
+                    response.setContentType("application/json"); // Set response type to JSON
+                    response.getWriter().write(
+                            Json.createObjectBuilder()
+                                    .add("status", "error")
+                                    .add("message", "Registration failed")
+                                    .build()
+                                    .toString()
+                    );
                 }
             } catch (SQLException | ClassNotFoundException e) {
                 throw new ServletException("Registration failed", e);

@@ -195,7 +195,9 @@ public class DriverServlet extends HttpServlet {
             String driverAddress = req.getParameter("driverAddress");
             String driverEmail = req.getParameter("driverEmail");
             String driverContact = req.getParameter("driverContact");
-            String driverStatus = req.getParameter("driverStatus");
+            String driverStatus = req.getParameter("status");
+
+            System.out.println(driverIdStr+" "+driverName+" "+driverNic+" "+driverAddress+" "+driverEmail+" "+driverContact+" "+driverStatus);
 
             if (driverIdStr == null || driverIdStr.trim().isEmpty() || driverName == null || driverName.trim().isEmpty() ||
                     driverNic == null || driverNic.trim().isEmpty() || driverAddress == null || driverAddress.trim().isEmpty() ||
