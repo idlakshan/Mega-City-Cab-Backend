@@ -1,5 +1,6 @@
 package com.mcc.backend.dao.custom;
 
+import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.entity.Driver;
 
 import java.sql.Connection;
@@ -12,4 +13,5 @@ public interface DriverDAO {
     Driver getDriverById(Connection conn, int driverId) throws SQLException, ClassNotFoundException;
     boolean updateDriver(Connection conn, Driver driver) throws SQLException, ClassNotFoundException;
     boolean deleteDriver(Connection conn, int driverId) throws SQLException, ClassNotFoundException;
+    List<Driver> getAvailableDrivers(Connection conn) throws Exception;
 }

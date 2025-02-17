@@ -1,13 +1,16 @@
 package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.DriverDAO;
+import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.entity.Driver;
+import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DriverDAOImpl implements DriverDAO {
@@ -100,5 +103,27 @@ public class DriverDAOImpl implements DriverDAO {
             int rowsDeleted = ps.executeUpdate();
             return rowsDeleted > 0;
         }
+    }
+
+    @Override
+    public List<Driver> getAvailableDrivers(Connection conn) throws Exception {
+        String sql = "SELECT * FROM driver WHERE status = 'Available'";
+        List<Driver> drivers = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Driver driver = new Driver();
+                driver.setDriverId(rs.getInt("driver_id"));
+                driver.setDriverName(rs.getString("driver_name"));
+                driver.setDriverNic(rs.getString("driver_nic"));
+                driver.setDriverAddress(rs.getString("driver_address"));
+                driver.setDriverEmail(rs.getString("driver_email"));
+                driver.setLicenseImage(rs.getString("license_image"));
+                driver.setDriverContact(rs.getString("driver_contact"));
+                driver.setStatus(rs.getString("status"));
+                drivers.add(driver);
+            }
+        }
+        return drivers;
     }
 }

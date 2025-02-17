@@ -1,13 +1,16 @@
 package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.CarDAO;
+import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
+import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CarDAOImpl implements CarDAO {
@@ -99,5 +102,26 @@ public class CarDAOImpl implements CarDAO {
             int rowsUpdated = ps.executeUpdate();
             return rowsUpdated > 0;
         }
+    }
+
+    @Override
+    public List<Car> getAvailableVehiclesByCategory(Connection conn, int categoryId) throws Exception {
+        String sql = "SELECT * FROM car WHERE category_id = ? AND status = 'Available'";
+        List<Car> cars = new ArrayList<>();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, categoryId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Car car = new Car();
+                car.setCarId(rs.getInt("car_id"));
+                car.setCategoryId(rs.getInt("category_id"));
+                car.setCarName(rs.getString("car_name"));
+                car.setCarNumber(rs.getString("car_number"));
+                car.setCarImage(rs.getString("car_image"));
+                car.setStatus(rs.getString("status"));
+                cars.add(car);
+            }
+        }
+        return cars;
     }
 }

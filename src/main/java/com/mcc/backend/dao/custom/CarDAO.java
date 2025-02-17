@@ -1,5 +1,6 @@
 package com.mcc.backend.dao.custom;
 
+import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
 
 import java.sql.Connection;
@@ -13,4 +14,5 @@ public interface CarDAO {
     boolean deleteCar(Connection conn, int carId) throws SQLException, ClassNotFoundException;
     Car getVehicleById(Connection conn, int carId) throws SQLException, ClassNotFoundException;
     boolean updateVehicle(Connection conn, Car car) throws SQLException, ClassNotFoundException;
+    List<Car> getAvailableVehiclesByCategory(Connection conn, int categoryId) throws Exception;
 }

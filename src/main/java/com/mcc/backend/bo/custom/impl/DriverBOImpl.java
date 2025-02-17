@@ -5,6 +5,7 @@ import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.dao.custom.DriverDAO;
 import com.mcc.backend.dao.custom.impl.DriverDAOImpl;
 import com.mcc.backend.entity.Driver;
+import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.DriverServlet;
 
 import java.sql.Connection;
@@ -94,6 +95,30 @@ public class DriverBOImpl implements DriverBO {
     public boolean deleteDriver(int driverId) throws SQLException, ClassNotFoundException {
         try (Connection conn = DriverServlet.dataSource.getConnection()) {
             return driverDAO.deleteDriver(conn, driverId);
+        }
+    }
+
+    @Override
+    public List<DriverDTO> getAvailableDrivers() throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            List<Driver> drivers = driverDAO.getAvailableDrivers(conn);
+
+            List<DriverDTO> driverDTOs = new ArrayList<>();
+            for (Driver driver : drivers) {
+                DriverDTO driverDTO = new DriverDTO();
+                driverDTO.setDriverId(driver.getDriverId());
+                driverDTO.setDriverName(driver.getDriverName());
+                driverDTO.setDriverNic(driver.getDriverNic());
+                driverDTO.setDriverAddress(driver.getDriverAddress());
+                driverDTO.setDriverEmail(driver.getDriverEmail());
+                driverDTO.setLicenseImage(driver.getLicenseImage());
+                driverDTO.setDriverContact(driver.getDriverContact());
+                driverDTO.setStatus(driver.getStatus());
+                driverDTOs.add(driverDTO);
+            }
+
+            return driverDTOs;
+
         }
     }
 }

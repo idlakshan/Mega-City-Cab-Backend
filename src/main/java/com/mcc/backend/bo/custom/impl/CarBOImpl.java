@@ -5,11 +5,13 @@ import com.mcc.backend.dao.custom.CarDAO;
 import com.mcc.backend.dao.custom.impl.CarDAOImpl;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
+import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CarBOImpl implements CarBO {
@@ -92,6 +94,25 @@ public class CarBOImpl implements CarBO {
             car.setCarId(dto.getCarId());
 
             return carDAO.updateVehicle(conn, car);
+        }
+    }
+
+    @Override
+    public List<CarDTO> getAvailableVehiclesByCategory(int categoryId) throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            List<Car> availableVehiclesByCategory = carDAO.getAvailableVehiclesByCategory(conn, categoryId);
+            List<CarDTO> carDTOs = new ArrayList<>();
+            for (Car car : availableVehiclesByCategory) {
+                CarDTO dto = new CarDTO();
+                dto.setCarId(car.getCarId());
+                dto.setCategoryId(car.getCategoryId());
+                dto.setCarName(car.getCarName());
+                dto.setCarNumber(car.getCarNumber());
+                dto.setCarImage(car.getCarImage());
+                dto.setStatus(car.getStatus());
+                carDTOs.add(dto);
+            }
+            return carDTOs;
         }
     }
 
