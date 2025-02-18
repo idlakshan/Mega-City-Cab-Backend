@@ -86,17 +86,9 @@ public class StripeCheckoutServlet extends HttpServlet {
 
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                    .addLineItem(
-                            SessionCreateParams.LineItem.builder()
-                                    .setPriceData(
-                                            SessionCreateParams.LineItem.PriceData.builder()
-                                                    .setCurrency(currency)
-                                                    .setUnitAmount(amountInCents) // Amount in cents
-                                                    .setProductData(
-                                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                    .setName("Ride Booking")
-                                                                    .build())
-                                                    .build())
+                    .addLineItem(SessionCreateParams.LineItem.builder().setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                    .setCurrency(currency).setUnitAmount(amountInCents).setProductData(
+                                            SessionCreateParams.LineItem.PriceData.ProductData.builder().setName("Ride Booking").build()).build())
                                     .setQuantity(1L)
                                     .build())
                     .setMode(SessionCreateParams.Mode.PAYMENT)

@@ -1,9 +1,7 @@
 package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.BookingDAO;
-import com.mcc.backend.dto.BookingDTO;
-import com.mcc.backend.servlet.BookingServlet;
-import com.mcc.backend.servlet.StripeCheckoutServlet;
+import com.mcc.backend.entity.Booking;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,20 +11,19 @@ import java.sql.Statement;
 public class BookingDAOImpl implements BookingDAO {
 
     @Override
-    public int save(BookingDTO bookingDTO) throws Exception {
+    public int save(Connection connection, Booking booking) throws Exception {
         String sql = "INSERT INTO booking (user_id, car_id, driver_id, pickup_location, drop_location, booking_datetime, customer_name, customer_email, customer_phone, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = StripeCheckoutServlet.dataSource.getConnection();
-             PreparedStatement pstm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstm.setInt(1, bookingDTO.getUserId());
-            pstm.setInt(2, bookingDTO.getCarId());
-            pstm.setInt(3, bookingDTO.getDriverId());
-            pstm.setString(4, bookingDTO.getPickupLocation());
-            pstm.setString(5, bookingDTO.getDropLocation());
-            pstm.setTimestamp(6, bookingDTO.getBookingDateTime());
-            pstm.setString(7, bookingDTO.getCustomerName());
-            pstm.setString(8, bookingDTO.getCustomerEmail());
-            pstm.setString(9, bookingDTO.getCustomerPhone());
-            pstm.setString(10, bookingDTO.getStatus());
+        try (PreparedStatement pstm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstm.setInt(1, booking.getUserId());
+            pstm.setInt(2, booking.getCarId());
+            pstm.setInt(3, booking.getDriverId());
+            pstm.setString(4, booking.getPickupLocation());
+            pstm.setString(5, booking.getDropLocation());
+            pstm.setTimestamp(6, booking.getBookingDateTime());
+            pstm.setString(7, booking.getCustomerName());
+            pstm.setString(8, booking.getCustomerEmail());
+            pstm.setString(9, booking.getCustomerPhone());
+            pstm.setString(10, booking.getStatus());
 
             pstm.executeUpdate();
 
