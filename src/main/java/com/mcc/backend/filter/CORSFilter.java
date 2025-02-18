@@ -16,18 +16,16 @@ public class CORSFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-//        System.out.println("CORSFilter");
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-
+        // Allow requests from your frontend origin
         httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Stripe-Signature");
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
 
-
-
+        // Handle preflight requests
         if (httpRequest.getMethod().equalsIgnoreCase("OPTIONS")) {
             httpResponse.setStatus(HttpServletResponse.SC_OK);
             return;
@@ -38,6 +36,5 @@ public class CORSFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
 }
