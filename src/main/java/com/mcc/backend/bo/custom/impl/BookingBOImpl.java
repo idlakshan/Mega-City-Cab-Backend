@@ -54,4 +54,18 @@ public class BookingBOImpl implements BookingBO {
         }
     }
 
+    @Override
+    public int getTotalBookings() throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getTotalBookings(conn);
+        }
+    }
+
+    @Override
+    public double getTotalRevenue() throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getTotalRevenue(conn);
+        }
+    }
+
 }

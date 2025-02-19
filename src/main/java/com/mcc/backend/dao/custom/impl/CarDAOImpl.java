@@ -124,4 +124,16 @@ public class CarDAOImpl implements CarDAO {
         }
         return cars;
     }
+
+    @Override
+    public int getAvailableVehicles(Connection conn) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT COUNT(*) AS availableVehicles FROM Car WHERE status = 'Available'";
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("availableVehicles");
+            }
+            return 0;
+        }
+    }
 }

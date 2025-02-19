@@ -14,4 +14,5 @@ public interface CarBO {
    CarDTO getVehicleById(int carId) throws SQLException, ClassNotFoundException;
    boolean updateVehicle(CarDTO car) throws SQLException, ClassNotFoundException;;
    List<CarDTO> getAvailableVehiclesByCategory(int categoryId) throws Exception;
+   int getAvailableVehicles() throws SQLException, ClassNotFoundException;
 }

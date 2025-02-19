@@ -10,6 +10,8 @@ import com.mcc.backend.servlet.AuthServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 public class AuthBOImpl implements AuthBO {
 
@@ -107,6 +109,50 @@ public class AuthBOImpl implements AuthBO {
             return userDTO;
         } finally {
             if (connection != null) {
+                connection.close();
+            }
+        }
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers() throws SQLException, ClassNotFoundException {
+        try (Connection conn = AuthServlet.dataSource.getConnection()) {
+            return authDAO.getAllUsers(conn);
+        }
+    }
+
+    @Override
+    public boolean deleteUser(int userId) throws SQLException, ClassNotFoundException {
+        Connection connection = null;
+        try {
+            connection = AuthServlet.dataSource.getConnection();
+            connection.setAutoCommit(false); // Start transaction
+
+            // Step 1: Delete from userdetails
+            authDAO.deleteUserDetails(connection, userId);
+
+            // Step 2: Delete from payments (linked via bookings)
+            authDAO.deletePaymentsByUserId(connection, userId);
+
+            // Step 3: Delete bookings associated with the user
+            authDAO.deleteBookingsByUserId(connection, userId);
+
+            // Step 4: Delete the user
+            boolean isUserDeleted = authDAO.deleteUser(connection, userId);
+
+            // Commit transaction
+            connection.commit();
+            return isUserDeleted;
+        } catch (SQLException e) {
+            // Rollback in case of error
+            if (connection != null) {
+                connection.rollback();
+            }
+            throw e;
+        } finally {
+            // Restore auto-commit and close connection
+            if (connection != null) {
+                connection.setAutoCommit(true);
                 connection.close();
             }
         }

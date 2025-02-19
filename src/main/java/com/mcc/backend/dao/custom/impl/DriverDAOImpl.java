@@ -126,4 +126,17 @@ public class DriverDAOImpl implements DriverDAO {
         }
         return drivers;
     }
+
+
+    @Override
+    public int getActiveDrivers(Connection conn) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT COUNT(*) AS activeDrivers FROM Driver WHERE status = 'Available'";
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("activeDrivers");
+            }
+            return 0;
+        }
+    }
 }

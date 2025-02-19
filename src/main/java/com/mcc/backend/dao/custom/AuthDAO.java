@@ -5,6 +5,7 @@ import com.mcc.backend.entity.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface AuthDAO {
     int findUserIdByEmailAndPassword(Connection connection, String email, String password) throws SQLException;
@@ -13,4 +14,9 @@ public interface AuthDAO {
     void saveUserDetails(Connection connection, int userId, int roleId) throws SQLException;
     int findRoleIdByName(Connection connection, String roleName) throws SQLException;
     User findUserById(Connection connection, int userId) throws SQLException;
+    List<UserDTO> getAllUsers(Connection connection) throws SQLException;
+    boolean deleteUser(Connection connection, int userId) throws SQLException;
+    void deleteUserDetails(Connection connection, int userId) throws SQLException;
+    void deletePaymentsByUserId(Connection connection, int userId) throws SQLException;
+    void deleteBookingsByUserId(Connection connection, int userId) throws SQLException;
 }

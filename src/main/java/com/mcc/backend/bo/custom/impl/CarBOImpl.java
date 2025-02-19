@@ -116,5 +116,12 @@ public class CarBOImpl implements CarBO {
         }
     }
 
+    @Override
+    public int getAvailableVehicles() throws SQLException, ClassNotFoundException {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return carDAO.getAvailableVehicles(conn);
+        }
+    }
+
 
 }

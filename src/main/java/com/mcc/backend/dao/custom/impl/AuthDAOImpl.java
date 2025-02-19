@@ -1,6 +1,7 @@
 package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.AuthDAO;
+import com.mcc.backend.dto.RoleDTO;
 import com.mcc.backend.dto.UserDTO;
 import com.mcc.backend.entity.User;
 
@@ -8,6 +9,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AuthDAOImpl implements AuthDAO {
 
@@ -100,4 +104,70 @@ public class AuthDAOImpl implements AuthDAO {
             }
         }
     }
+
+    @Override
+    public List<UserDTO> getAllUsers(Connection connection) throws SQLException {
+        List<UserDTO> users = new ArrayList<>();
+        String sql = "SELECT u.id, u.name, u.phone, u.nic, u.email, r.id AS role_id, r.name AS role FROM user u LEFT JOIN userdetails ud ON u.id = ud.user_id " +
+                "LEFT JOIN role r ON ud.role_id = r.id";
+
+        try (PreparedStatement pstm = connection.prepareStatement(sql);
+             ResultSet rs = pstm.executeQuery()) {
+            while (rs.next()) {
+                UserDTO user = new UserDTO();
+                user.setId(rs.getInt("id"));
+                user.setName(rs.getString("name"));
+                user.setNic(rs.getString("nic"));
+                user.setPhone(rs.getString("phone"));
+                user.setEmail(rs.getString("email"));
+
+                RoleDTO role = new RoleDTO();
+                role.setId(rs.getInt("role_id"));
+                role.setName(rs.getString("role"));
+                user.setRole(role);
+
+                users.add(user);
+            }
+        }
+        return users;
+    }
+
+    @Override
+    public boolean deleteUser(Connection connection, int userId) throws SQLException {
+        String sql = "DELETE FROM user WHERE id = ?";
+        try (PreparedStatement pstm = connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            int rowsAffected = pstm.executeUpdate();
+            return rowsAffected > 0;
+        }
+    }
+
+    @Override
+    public void deleteUserDetails(Connection connection, int userId) throws SQLException {
+        String sql = "DELETE FROM userdetails WHERE user_id = ?";
+        try (PreparedStatement pstm = connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            pstm.executeUpdate();
+        }
+    }
+
+    @Override
+    public void deletePaymentsByUserId(Connection connection, int userId) throws SQLException {
+        String sql = "DELETE FROM payment WHERE booking_id IN (SELECT booking_id FROM booking WHERE user_id = ?)";
+        try (PreparedStatement pstm = connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            pstm.executeUpdate();
+        }
+    }
+
+    @Override
+    public void deleteBookingsByUserId(Connection connection, int userId) throws SQLException {
+        String sql = "DELETE FROM booking WHERE user_id = ?";
+        try (PreparedStatement pstm = connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            pstm.executeUpdate();
+        }
+    }
+
+
 }

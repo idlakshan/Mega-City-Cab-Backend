@@ -4,10 +4,7 @@ import com.mcc.backend.dao.custom.BookingDAO;
 import com.mcc.backend.dto.BookingDTO;
 import com.mcc.backend.entity.Booking;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,5 +89,33 @@ public class BookingDAOImpl implements BookingDAO {
             }
         }
         return bookings;
+    }
+
+    @Override
+    public int getTotalBookings(Connection conn) {
+        String sql = "SELECT COUNT(*) AS totalBookings FROM Booking";
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("totalBookings");
+            }
+            return 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public double getTotalRevenue(Connection conn)  {
+        String sql = "SELECT SUM(amount) AS totalRevenue FROM Payment";
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            ResultSet rs = pstm.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("totalRevenue");
+            }
+            return 0.0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

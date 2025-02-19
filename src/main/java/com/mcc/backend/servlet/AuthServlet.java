@@ -9,6 +9,7 @@ import io.jsonwebtoken.Jws;
 
 import javax.annotation.Resource;
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.ServletException;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.List;
 
 @WebServlet("/auth/*")
 public class AuthServlet extends HttpServlet {
@@ -120,11 +122,78 @@ public class AuthServlet extends HttpServlet {
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
+        } else if (path.equals("/all-users")) {
+            try {
+                Jws<Claims> claims = Security.isValidAdminJWT(request, response); // Ensure only admins can access
+                if (claims == null) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.");
+                    return;
+                }
+
+                List<UserDTO> users = authBO.getAllUsers();
+                JsonArrayBuilder usersArray = Json.createArrayBuilder();
+                for (UserDTO user : users) {
+                    usersArray.add(Json.createObjectBuilder()
+                            .add("id", user.getId())
+                            .add("name", user.getName())
+                            .add("nic", user.getNic())
+                            .add("phone", user.getPhone())
+                            .add("email", user.getEmail())
+                            .add("role", Json.createObjectBuilder() // Include role
+                                    .add("id", user.getRole().getId())
+                                    .add("name", user.getRole().getName())));
+                }
+                JsonObject responseJson = Json.createObjectBuilder()
+                        .add("status", HttpServletResponse.SC_OK)
+                        .add("message", "All users retrieved successfully!")
+                        .add("data", usersArray)
+                        .build();
+                response.setContentType("application/json");
+                response.getWriter().write(responseJson.toString());
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.");
+            }
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
         }
     }
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = request.getPathInfo();
 
+        if (path != null && path.startsWith("/delete/")) {
+            try {
+                Jws<Claims> claims = Security.isValidAdminJWT(request, response); // Ensure only admins can delete users
+                if (claims == null) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.");
+                    return;
+                }
+
+                int userId = Integer.parseInt(path.split("/")[2]); // Extract user ID from the path
+                boolean isDeleted = authBO.deleteUser(userId);
+
+                if (isDeleted) {
+                    JsonObject responseJson = Json.createObjectBuilder()
+                            .add("status", HttpServletResponse.SC_OK)
+                            .add("message", "User and associated details deleted successfully!")
+                            .build();
+                    response.setContentType("application/json");
+                    response.getWriter().write(responseJson.toString());
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found or could not be deleted.");
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format.");
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.");
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
+        }
+    }
 
     private JsonObject parseJson(InputStream inputStream) throws IOException {
         try (JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {

@@ -121,4 +121,11 @@ public class DriverBOImpl implements DriverBO {
 
         }
     }
+
+    @Override
+    public int getActiveDrivers() throws SQLException, ClassNotFoundException {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return driverDAO.getActiveDrivers(conn);
+        }
+    }
 }

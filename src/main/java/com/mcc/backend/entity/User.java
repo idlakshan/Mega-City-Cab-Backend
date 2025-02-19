@@ -7,18 +7,21 @@ public class User {
     private String nic;
     private String email;
     private String password;
+    private Role role;
 
     public User() {
     }
 
-    public User(int id, String name, String phone, String nic, String email, String password) {
+    public User(int id, String name, String phone, String nic, String email, String password, Role role) {
         this.id = id;
         this.name = name;
         this.phone = phone;
         this.nic = nic;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
+
 
     public int getId() {
         return id;
@@ -67,4 +70,12 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
 }

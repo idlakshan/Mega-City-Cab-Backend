@@ -167,7 +167,7 @@ public class DriverServlet extends HttpServlet {
                             .build();
 
                     resp.setContentType("application/json");
-                    resp.getWriter().write(response.toString());
+
                 } else {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_NOT_FOUND, "Driver not found", null, "No driver found with ID: " + driverId);
                 }
@@ -197,7 +197,7 @@ public class DriverServlet extends HttpServlet {
             String driverContact = req.getParameter("driverContact");
             String driverStatus = req.getParameter("status");
 
-            System.out.println(driverIdStr+" "+driverName+" "+driverNic+" "+driverAddress+" "+driverEmail+" "+driverContact+" "+driverStatus);
+            //System.out.println(driverIdStr+" "+driverName+" "+driverNic+" "+driverAddress+" "+driverEmail+" "+driverContact+" "+driverStatus);
 
             if (driverIdStr == null || driverIdStr.trim().isEmpty() || driverName == null || driverName.trim().isEmpty() ||
                     driverNic == null || driverNic.trim().isEmpty() || driverAddress == null || driverAddress.trim().isEmpty() ||

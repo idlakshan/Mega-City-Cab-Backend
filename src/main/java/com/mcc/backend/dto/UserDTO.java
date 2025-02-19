@@ -7,9 +7,21 @@ public class UserDTO {
     private String nic;
     private String email;
     private String password;
+    private RoleDTO role;
 
     public UserDTO() {
     }
+
+    public UserDTO(int id, String name, String phone, String nic, String email, String password, RoleDTO role) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+        this.nic = nic;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
 
     public UserDTO(int id, String name, String phone, String nic, String email, String password) {
         this.id = id;
@@ -66,5 +78,13 @@ public class UserDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public RoleDTO getRole() {
+        return role;
+    }
+
+    public void setRole(RoleDTO role) {
+        this.role = role;
     }
 }
