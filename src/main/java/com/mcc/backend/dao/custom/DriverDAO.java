@@ -15,4 +15,5 @@ public interface DriverDAO {
     boolean deleteDriver(Connection conn, int driverId) throws SQLException, ClassNotFoundException;
     List<Driver> getAvailableDrivers(Connection conn) throws Exception;
     int getActiveDrivers(Connection conn) throws SQLException, ClassNotFoundException;
+    void updateDriverStatus(DriverDTO driverDTO) throws Exception;
 }

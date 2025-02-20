@@ -1,5 +1,11 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.custom.CarBO;
+import com.mcc.backend.bo.custom.DriverBO;
+import com.mcc.backend.bo.custom.impl.CarBOImpl;
+import com.mcc.backend.bo.custom.impl.DriverBOImpl;
+import com.mcc.backend.dto.CarDTO;
+import com.mcc.backend.dto.DriverDTO;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -38,6 +44,8 @@ public class StripeCheckoutServlet extends HttpServlet {
 
     private BookingBO bookingBO = new BookingBOImpl();
     private PaymentBO paymentBO = new PaymentBOImpl();
+    private DriverBO driverBO = new DriverBOImpl();
+    private CarBO carBO = new CarBOImpl();
 
     @Override
     public void init() throws ServletException {
@@ -77,7 +85,6 @@ public class StripeCheckoutServlet extends HttpServlet {
             String customerPhone = req.getParameter("customerPhone");
 
             DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-
             DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime dateTime = LocalDateTime.parse(bookingDateTime, inputFormatter);
             String formattedDateTime = dateTime.format(outputFormatter);
@@ -112,6 +119,17 @@ public class StripeCheckoutServlet extends HttpServlet {
             bookingDTO.setStatus("InProgress");
 
             int bookingId = bookingBO.saveBooking(bookingDTO);
+
+            DriverDTO driverDTO = new DriverDTO();
+            driverDTO.setDriverId(Integer.parseInt(driverId));
+            driverDTO.setStatus("Assigned");
+            driverBO.updateDriverStatus(driverDTO);
+
+            CarDTO carDTO = new CarDTO();
+            carDTO.setCarId(Integer.parseInt(carId));
+            carDTO.setStatus("Booked");
+            carBO.updateCarStatus(carDTO);
+
 
 
             PaymentDTO paymentDTO = new PaymentDTO();

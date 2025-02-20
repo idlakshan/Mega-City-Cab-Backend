@@ -3,6 +3,7 @@ package com.mcc.backend.dao.custom.impl;
 import com.mcc.backend.dao.custom.CarDAO;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
+import com.mcc.backend.servlet.StripeCheckoutServlet;
 import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.Connection;
@@ -134,6 +135,17 @@ public class CarDAOImpl implements CarDAO {
                 return rs.getInt("availableVehicles");
             }
             return 0;
+        }
+    }
+
+    @Override
+    public void updateCarStatus(CarDTO carDTO) throws Exception {
+        String sql = "UPDATE car SET status = ? WHERE car_id = ?";
+        try (Connection connection = StripeCheckoutServlet.dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, carDTO.getStatus());
+            statement.setInt(2, carDTO.getCarId());
+            statement.executeUpdate();
         }
     }
 }

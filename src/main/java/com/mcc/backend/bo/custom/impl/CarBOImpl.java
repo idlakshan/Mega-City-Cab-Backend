@@ -123,5 +123,8 @@ public class CarBOImpl implements CarBO {
         }
     }
 
-
+    @Override
+    public void updateCarStatus(CarDTO carDTO) throws Exception {
+        carDAO.updateCarStatus(carDTO);
+    }
 }

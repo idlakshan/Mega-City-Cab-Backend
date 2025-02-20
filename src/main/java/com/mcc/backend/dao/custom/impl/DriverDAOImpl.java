@@ -3,6 +3,7 @@ package com.mcc.backend.dao.custom.impl;
 import com.mcc.backend.dao.custom.DriverDAO;
 import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.entity.Driver;
+import com.mcc.backend.servlet.StripeCheckoutServlet;
 import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.Connection;
@@ -139,4 +140,16 @@ public class DriverDAOImpl implements DriverDAO {
             return 0;
         }
     }
+
+    @Override
+    public void updateDriverStatus(DriverDTO driverDTO) throws Exception {
+        String sql = "UPDATE driver SET status = ? WHERE driver_id = ?";
+        try (Connection connection = StripeCheckoutServlet.dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, driverDTO.getStatus());
+            statement.setInt(2, driverDTO.getDriverId());
+            statement.executeUpdate();
+        }
+    }
+
 }

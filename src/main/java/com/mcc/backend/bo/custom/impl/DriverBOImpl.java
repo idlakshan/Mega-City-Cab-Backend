@@ -128,4 +128,9 @@ public class DriverBOImpl implements DriverBO {
             return driverDAO.getActiveDrivers(conn);
         }
     }
+
+    @Override
+    public void updateDriverStatus(DriverDTO driverDTO) throws Exception {
+        driverDAO.updateDriverStatus(driverDTO);
+    }
 }
