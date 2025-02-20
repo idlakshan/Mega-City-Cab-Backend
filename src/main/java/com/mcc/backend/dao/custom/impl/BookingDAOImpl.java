@@ -5,9 +5,7 @@ import com.mcc.backend.dto.BookingDTO;
 import com.mcc.backend.entity.Booking;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class BookingDAOImpl implements BookingDAO {
 
@@ -118,4 +116,28 @@ public class BookingDAOImpl implements BookingDAO {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Map<String, Integer> getBookingCountsLast7Days(Connection conn) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT generated_dates.bookingDay, COALESCE(COUNT(b.booking_id), 0) AS bookingCount " +
+                "FROM ( " +
+                "    SELECT CURDATE() - INTERVAL n DAY AS bookingDay FROM ( " +
+                "        SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL " +
+                "        SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 " +
+                "    ) numbers " +
+                ") generated_dates " +
+                "LEFT JOIN Booking b ON DATE(b.created_at) = generated_dates.bookingDay " +
+                "GROUP BY generated_dates.bookingDay " +
+                "ORDER BY generated_dates.bookingDay DESC;";
+
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            ResultSet rs = pstm.executeQuery();
+            Map<String, Integer> bookingsMap = new LinkedHashMap<>();
+            while (rs.next()) {
+                bookingsMap.put(rs.getString("bookingDay"), rs.getInt("bookingCount"));
+            }
+            return bookingsMap;
+        }
+    }
+
 }

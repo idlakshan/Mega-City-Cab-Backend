@@ -5,10 +5,12 @@ import com.mcc.backend.dao.custom.PaymentDAO;
 import com.mcc.backend.dao.custom.impl.PaymentDAOImpl;
 import com.mcc.backend.dto.PaymentDTO;
 import com.mcc.backend.entity.Payment;
+import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.StripeCheckoutServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class PaymentBOImpl implements PaymentBO {
 
@@ -16,10 +18,9 @@ public class PaymentBOImpl implements PaymentBO {
 
     @Override
     public void savePayment(PaymentDTO paymentDTO) throws Exception {
-        try (Connection connection = StripeCheckoutServlet.dataSource.getConnection()) {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
             Payment payment = new Payment();
 
-            // Map DTO to Entity
             payment.setBookingId(paymentDTO.getBookingId());
             payment.setAmount(paymentDTO.getAmount());
             payment.setPaymentMethod(paymentDTO.getPaymentMethod());
@@ -27,6 +28,13 @@ public class PaymentBOImpl implements PaymentBO {
             payment.setPaymentDate(paymentDTO.getPaymentDate());
 
             paymentDAO.save(connection, payment);
+        }
+    }
+
+    @Override
+    public Map<String, Double> getTotalPaymentsLast7Days() throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return paymentDAO.getTotalPaymentsLast7Days(conn);
         }
     }
 }

@@ -3,9 +3,11 @@ package com.mcc.backend.servlet;
 import com.mcc.backend.bo.custom.BookingBO;
 import com.mcc.backend.bo.custom.CarBO;
 import com.mcc.backend.bo.custom.DriverBO;
+import com.mcc.backend.bo.custom.PaymentBO;
 import com.mcc.backend.bo.custom.impl.BookingBOImpl;
 import com.mcc.backend.bo.custom.impl.CarBOImpl;
 import com.mcc.backend.bo.custom.impl.DriverBOImpl;
+import com.mcc.backend.bo.custom.impl.PaymentBOImpl;
 import com.mcc.backend.config.Security;
 import com.mcc.backend.dto.BookingDTO;
 import com.mcc.backend.dto.CarDTO;
@@ -18,6 +20,7 @@ import javax.annotation.Resource;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,6 +30,7 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @WebServlet("/booking/*")
@@ -38,6 +42,7 @@ public class BookingServlet extends HttpServlet {
     private CarBO carBO = new CarBOImpl();
     private DriverBO driverBO = new DriverBOImpl();
     private BookingBO bookingBO = new BookingBOImpl();
+    private PaymentBO paymentBO = new PaymentBOImpl();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -129,12 +134,12 @@ public class BookingServlet extends HttpServlet {
                 e.printStackTrace();
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
             }
-        } else if (pathInfo.startsWith("/bookings-count/")) {
+        } else if (pathInfo.startsWith("/bookings-count")) {
             Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
             if (claims != null) {
                 try {
-                    System.out.println("works");
-                    // Fetch stats data
+                  //  System.out.println("works");
+
                     int totalBookings = bookingBO.getTotalBookings();
                     int activeDrivers = driverBO.getActiveDrivers();
                     int availableVehicles = carBO.getAvailableVehicles();
@@ -158,7 +163,40 @@ public class BookingServlet extends HttpServlet {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
                 }
             }
-        }else {
+        }else if (pathInfo.startsWith("/last-7-days-data")) {
+            Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
+            if (claims != null) {
+                try {
+
+                    Map<String, Double> paymentsLast7Days = paymentBO.getTotalPaymentsLast7Days();
+                    Map<String, Integer> bookingsLast7Days = bookingBO.getBookingCountsLast7Days();
+
+
+                    JsonObjectBuilder paymentsBuilder = Json.createObjectBuilder();
+                    for (Map.Entry<String, Double> entry : paymentsLast7Days.entrySet()) {
+                        paymentsBuilder.add(entry.getKey(), entry.getValue());
+                    }
+
+                    JsonObjectBuilder bookingsBuilder = Json.createObjectBuilder();
+                    for (Map.Entry<String, Integer> entry : bookingsLast7Days.entrySet()) {
+                        bookingsBuilder.add(entry.getKey(), entry.getValue());
+                    }
+
+                    JsonObject data = Json.createObjectBuilder()
+                            .add("paymentsLast7Days", paymentsBuilder.build())
+                            .add("bookingsLast7Days", bookingsBuilder.build())
+                            .build();
+
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Last 7 days data retrieved successfully!", data, null);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
+                }
+            }
+        }
+
+        else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }

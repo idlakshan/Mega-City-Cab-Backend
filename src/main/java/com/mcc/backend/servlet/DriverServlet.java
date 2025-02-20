@@ -160,13 +160,7 @@ public class DriverServlet extends HttpServlet {
                             .add("status", driver.getStatus())
                             .build();
 
-                    JsonObject response = Json.createObjectBuilder()
-                            .add("status", HttpServletResponse.SC_OK)
-                            .add("message", "Driver retrieved successfully!")
-                            .add("data", driverJson)
-                            .build();
-
-                    resp.setContentType("application/json");
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Driver retrieved successfully!", driverJson, null);
 
                 } else {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_NOT_FOUND, "Driver not found", null, "No driver found with ID: " + driverId);

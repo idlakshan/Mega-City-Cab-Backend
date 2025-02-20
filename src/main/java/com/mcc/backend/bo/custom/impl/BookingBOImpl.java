@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class BookingBOImpl implements BookingBO {
 
@@ -65,6 +66,13 @@ public class BookingBOImpl implements BookingBO {
     public double getTotalRevenue() throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
             return bookingDAO.getTotalRevenue(conn);
+        }
+    }
+
+    @Override
+    public Map<String, Integer> getBookingCountsLast7Days() throws SQLException, ClassNotFoundException {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getBookingCountsLast7Days(conn);
         }
     }
 
