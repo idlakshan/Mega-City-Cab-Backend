@@ -2,10 +2,13 @@ package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.PaymentDAO;
 import com.mcc.backend.entity.Payment;
+import com.mcc.backend.servlet.BookingServlet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,6 +41,30 @@ public class PaymentDAOImpl implements PaymentDAO {
             }
             return paymentsMap;
         }
+    }
+
+    @Override
+    public Map<String, Double> getPaymentHistoryByUserId(Connection con,int userId) throws Exception{
+        String sql="SELECT DATE_FORMAT(payment_date, '%b') AS month, SUM(amount) AS total_amount " +
+                "FROM payment " +
+                "WHERE booking_id IN (SELECT booking_id FROM booking WHERE user_id = ?) " +
+                "GROUP BY DATE_FORMAT(payment_date, '%b')";
+
+        Map<String, Double> paymentHistory = new HashMap<>();
+        try (PreparedStatement pstm = con.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            ResultSet rst = pstm.executeQuery();
+
+            while (rst.next()) {
+                String month = rst.getString("month");
+                double totalAmount = rst.getDouble("total_amount");
+                paymentHistory.put(month, totalAmount);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return paymentHistory;
     }
 
 }

@@ -7,4 +7,5 @@ import java.util.Map;
 public interface PaymentBO {
     void savePayment(PaymentDTO paymentDTO) throws Exception;
     Map<String, Double> getTotalPaymentsLast7Days() throws Exception;
+    Map<String, Double> getPaymentHistoryByUserId(int userId) throws Exception;
 }

@@ -10,6 +10,7 @@ import com.mcc.backend.servlet.StripeCheckoutServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Map;
 
 public class PaymentBOImpl implements PaymentBO {
@@ -35,6 +36,13 @@ public class PaymentBOImpl implements PaymentBO {
     public Map<String, Double> getTotalPaymentsLast7Days() throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
             return paymentDAO.getTotalPaymentsLast7Days(conn);
+        }
+    }
+
+    @Override
+    public Map<String, Double> getPaymentHistoryByUserId(int userId) throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return paymentDAO.getPaymentHistoryByUserId(conn,userId);
         }
     }
 }
