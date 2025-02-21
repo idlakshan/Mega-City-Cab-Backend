@@ -19,4 +19,9 @@ public interface BookingBO {
     void updateBookingCarStatus(int carId, String status) throws Exception;
     void updateBookingDriverStatus(int driverId, String status) throws Exception;
     BookingDTO getBookingById(int bookingId) throws Exception;
+
+    int getTotalBookingsByUserId(int userId) throws Exception;
+    double getTotalSpendingByUserId(int userId) throws Exception;
+    String getActiveSinceByUserId(int userId) throws Exception;
+    String getFavoriteLocationByUserId(int userId) throws Exception;
 }

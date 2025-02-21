@@ -21,4 +21,9 @@ public interface BookingDAO {
     void updateBookingCarStatus(Connection connection, int carId, String status) throws Exception;
     void updateBookingDriverStatus(Connection connection, int driverId, String status) throws Exception;
     BookingDTO getBookingById(Connection connection, int bookingId) throws Exception;
+
+    int getTotalBookingsByUserId(Connection connection,int userId);
+    double getTotalSpendingByUserId(Connection connection,int userId);
+    String getActiveSinceByUserId(Connection connection,int userId);
+    String getFavoriteLocationByUserId(Connection connection,int userId);
 }

@@ -257,4 +257,66 @@ public class BookingDAOImpl implements BookingDAO {
         return null;
     }
 
+    @Override
+    public int getTotalBookingsByUserId(Connection connection,int userId) {
+        String sql="SELECT COUNT(*) AS total_bookings FROM Booking where user_id=?";
+        try (PreparedStatement pstm =connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            ResultSet rst = pstm.executeQuery();
+            if (rst.next()) {
+                return rst.getInt("total_bookings");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public double getTotalSpendingByUserId(Connection connection,int userId) {
+        String sql="SELECT SUM(amount) AS total_spending FROM payment WHERE booking_id IN (SELECT booking_id FROM booking WHERE user_id = ?)";
+        try (PreparedStatement pstm =connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            ResultSet rst = pstm.executeQuery();
+            if (rst.next()) {
+                return rst.getDouble("total_spending");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
+    @Override
+    public String getActiveSinceByUserId(Connection connection,int userId) {
+        String sql="SELECT MIN(booking_datetime) AS active_since FROM booking WHERE user_id = ?";
+        try (PreparedStatement pstm =connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            ResultSet rst = pstm.executeQuery();
+            if (rst.next()) {
+                return rst.getString("active_since");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "N/A";
+    }
+
+    @Override
+    public String getFavoriteLocationByUserId(Connection connection,int userId) {
+        String sql="SELECT pickup_location, COUNT(*) AS location_count FROM booking WHERE user_id = ? GROUP BY pickup_location ORDER BY location_count DESC LIMIT 1";
+        try (PreparedStatement pstm =connection.prepareStatement(sql)) {
+            pstm.setInt(1, userId);
+            ResultSet rst = pstm.executeQuery();
+            if (rst.next()) {
+                return rst.getString("pickup_location");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "N/A";
+    }
+
+
+
 }

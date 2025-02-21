@@ -289,6 +289,41 @@ public class BookingServlet extends HttpServlet {
                 e.printStackTrace();
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
             }
+        }else if (pathInfo.startsWith("/user-stats/")) {
+            Jws<Claims> claims = Security.isValidJWT(req, resp);
+            if (claims == null) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.", null, null);
+                return;
+            }
+
+            String[] pathParts = pathInfo.split("/");
+            if (pathParts.length < 3) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid path format. Expected /user-stats/{userId}.", null, null);
+                return;
+            }
+
+            try {
+                int userId = Integer.parseInt(pathParts[2]);
+                int totalRides = bookingBO.getTotalBookingsByUserId(userId);
+                double totalSpending = bookingBO.getTotalSpendingByUserId(userId);
+                String activeSince = bookingBO.getActiveSinceByUserId(userId);
+                String favoriteLocation = bookingBO.getFavoriteLocationByUserId(userId);
+
+                JsonObject data = Json.createObjectBuilder()
+                        .add("totalRides", totalRides)
+                        .add("totalSpending", totalSpending)
+                        .add("activeSince", activeSince)
+                        .add("favoriteLocation", favoriteLocation)
+                        .build();
+
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "User stats retrieved successfully!", data, null);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format.", null, e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
+            }
         }
         else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -305,16 +340,11 @@ public class BookingServlet extends HttpServlet {
 
             try {
                 if ("Completed".equals(status)) {
-                    // Update booking status to Completed
                     bookingBO.updateBookingStatus(bookingId, status);
-
-                    // Get the booking details
                     BookingDTO booking = bookingBO.getBookingById(bookingId);
 
-                    // Update car status to Available
                     bookingBO.updateBookingCarStatus(booking.getCarId(), "Available");
 
-                    // Update driver status to Available
                     bookingBO.updateBookingDriverStatus(booking.getDriverId(), "Available");
 
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Booking status updated to Completed and car/driver status updated to Available.", null, null);

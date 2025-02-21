@@ -183,4 +183,36 @@ public class BookingBOImpl implements BookingBO {
         }
     }
 
+    @Override
+    public int getTotalBookingsByUserId(int userId) throws Exception  {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getTotalBookingsByUserId(connection,userId);
+        }
+
+    }
+
+    @Override
+    public double getTotalSpendingByUserId(int userId) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getTotalSpendingByUserId(connection,userId);
+        }
+
+    }
+
+    @Override
+    public String getActiveSinceByUserId(int userId) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getActiveSinceByUserId(connection,userId);
+        }
+
+    }
+
+    @Override
+    public String getFavoriteLocationByUserId(int userId) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getFavoriteLocationByUserId(connection,userId);
+        }
+
+    }
+
 }
