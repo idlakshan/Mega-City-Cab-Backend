@@ -15,6 +15,7 @@ import com.mcc.backend.servlet.StripeCheckoutServlet;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +89,26 @@ public class BookingBOImpl implements BookingBO {
     @Override
     public List<BookingDTO> getBookingsByUserId(int userId) throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
-            return bookingDAO.getBookingsByUserId(conn, userId);
+            List<Booking> bookingsByUserId = bookingDAO.getBookingsByUserId(conn, userId);
+            List<BookingDTO> bookingDTOs = new ArrayList<>();
+            for (Booking booking : bookingsByUserId) {
+                BookingDTO dto = new BookingDTO();
+                dto.setBookingId(booking.getBookingId());
+                dto.setUserId(booking.getUserId());
+                dto.setCarId(booking.getCarId());
+                dto.setDriverId(booking.getDriverId());
+                dto.setPickupLocation(booking.getPickupLocation());
+                dto.setDropLocation(booking.getDropLocation());
+                dto.setBookingDateTime(booking.getBookingDateTime());
+                dto.setCustomerName(booking.getCustomerName());
+                dto.setCustomerEmail(booking.getCustomerEmail());
+                dto.setCustomerPhone(booking.getCustomerPhone());
+                dto.setStatus(booking.getStatus());
+
+                bookingDTOs.add(dto);
+
+            }
+            return bookingDTOs;
         }
     }
 
@@ -179,7 +199,21 @@ public class BookingBOImpl implements BookingBO {
     @Override
     public BookingDTO getBookingById(int bookingId) throws Exception {
         try (Connection connection = BookingServlet.dataSource.getConnection()) {
-            return bookingDAO.getBookingById(connection, bookingId);
+            Booking bookingById = bookingDAO.getBookingById(connection, bookingId);
+            BookingDTO dto = new BookingDTO();
+            dto.setBookingId(bookingById.getBookingId());
+            dto.setUserId(bookingById.getUserId());
+            dto.setCarId(bookingById.getCarId());
+            dto.setDriverId(bookingById.getDriverId());
+            dto.setPickupLocation(bookingById.getPickupLocation());
+            dto.setDropLocation(bookingById.getDropLocation());
+            dto.setBookingDateTime(bookingById.getBookingDateTime());
+            dto.setCustomerName(bookingById.getCustomerName());
+            dto.setCustomerEmail(bookingById.getCustomerEmail());
+            dto.setCustomerPhone(bookingById.getCustomerPhone());
+            dto.setStatus(bookingById.getStatus());
+
+            return dto;
         }
     }
 
@@ -214,5 +248,13 @@ public class BookingBOImpl implements BookingBO {
         }
 
     }
+
+    @Override
+    public List<BookingDTO> getBookingsDetailsByUserId(int userId) throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getBookingsWithDetailsByUserId(conn, userId);
+        }
+    }
+
 
 }

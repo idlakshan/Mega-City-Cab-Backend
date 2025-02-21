@@ -17,10 +17,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 
 import javax.annotation.Resource;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -350,6 +347,57 @@ public class BookingServlet extends HttpServlet {
                         .build();
 
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Payment history retrieved successfully!", response, null);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format.", null, e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
+            }
+        }else if (pathInfo.startsWith("/booking-details")) {
+            Jws<Claims> claims = Security.isValidJWT(req, resp);
+            if (claims == null) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.", null, null);
+                return;
+            }
+
+            try {
+                int userId = (int) claims.getBody().get("userId");
+                List<BookingDTO> userBookings = bookingBO.getBookingsDetailsByUserId(userId);
+
+                JsonArrayBuilder bookingsArray = Json.createArrayBuilder();
+                for (BookingDTO booking : userBookings) {
+                    JsonObject paymentJson = Json.createObjectBuilder()
+                            .add("paymentId", booking.getPayment().getPaymentId())
+                            .add("amount", booking.getPayment().getAmount())
+                            .add("paymentMethod", booking.getPayment().getPaymentMethod())
+                            .add("paymentStatus", booking.getPayment().getPaymentStatus())
+                            .add("paymentDate", booking.getPayment().getPaymentDate().toString())
+                            .build();
+
+                    JsonObject bookingJson = Json.createObjectBuilder()
+                            .add("bookingId", booking.getBookingId())
+                            .add("userId", booking.getUserId())
+                            .add("carId", booking.getCarId())
+                            .add("driverId", booking.getDriverId())
+                            .add("pickupLocation", booking.getPickupLocation())
+                            .add("dropLocation", booking.getDropLocation())
+                            .add("bookingDateTime", booking.getBookingDateTime().toString())
+                            .add("customerName", booking.getCustomerName())
+                            .add("customerEmail", booking.getCustomerEmail())
+                            .add("customerPhone", booking.getCustomerPhone())
+                            .add("status", booking.getStatus())
+                            .add("payment", paymentJson)
+                            .build();
+
+                    bookingsArray.add(bookingJson);
+                }
+                JsonObject jsonResponse = Json.createObjectBuilder()
+                        .add("data", bookingsArray)
+                        .build();
+
+
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Booking Details retrieved successfully!",jsonResponse , null);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format.", null, e.getMessage());

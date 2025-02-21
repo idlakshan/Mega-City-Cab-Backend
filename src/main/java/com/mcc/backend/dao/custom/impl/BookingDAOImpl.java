@@ -4,6 +4,7 @@ import com.mcc.backend.dao.custom.BookingDAO;
 import com.mcc.backend.dto.BookingDTO;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.dto.DriverDTO;
+import com.mcc.backend.dto.PaymentDTO;
 import com.mcc.backend.entity.Booking;
 import com.mcc.backend.entity.Car;
 import com.mcc.backend.entity.Driver;
@@ -80,26 +81,26 @@ public class BookingDAOImpl implements BookingDAO {
 
 
     @Override
-    public List<BookingDTO> getBookingsByUserId(Connection connection, int userId) throws Exception {
-        List<BookingDTO> bookings = new ArrayList<>();
+    public List<Booking> getBookingsByUserId(Connection connection, int userId) throws Exception {
+        List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM booking WHERE user_id = ?";
         try (PreparedStatement pstm = connection.prepareStatement(sql)) {
             pstm.setInt(1, userId);
             try (ResultSet rs = pstm.executeQuery()) {
                 while (rs.next()) {
-                    BookingDTO dto = new BookingDTO();
-                    dto.setBookingId(rs.getInt("booking_id"));
-                    dto.setUserId(rs.getInt("user_id"));
-                    dto.setCarId(rs.getInt("car_id"));
-                    dto.setDriverId(rs.getInt("driver_id"));
-                    dto.setPickupLocation(rs.getString("pickup_location"));
-                    dto.setDropLocation(rs.getString("drop_location"));
-                    dto.setBookingDateTime(rs.getTimestamp("booking_datetime"));
-                    dto.setCustomerName(rs.getString("customer_name"));
-                    dto.setCustomerEmail(rs.getString("customer_email"));
-                    dto.setCustomerPhone(rs.getString("customer_phone"));
-                    dto.setStatus(rs.getString("status"));
-                    bookings.add(dto);
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getInt("booking_id"));
+                    booking.setUserId(rs.getInt("user_id"));
+                    booking.setCarId(rs.getInt("car_id"));
+                    booking.setDriverId(rs.getInt("driver_id"));
+                    booking.setPickupLocation(rs.getString("pickup_location"));
+                    booking.setDropLocation(rs.getString("drop_location"));
+                    booking.setBookingDateTime(rs.getTimestamp("booking_datetime"));
+                    booking.setCustomerName(rs.getString("customer_name"));
+                    booking.setCustomerEmail(rs.getString("customer_email"));
+                    booking.setCustomerPhone(rs.getString("customer_phone"));
+                    booking.setStatus(rs.getString("status"));
+                    bookings.add(booking);
                 }
             }
         }
@@ -232,25 +233,25 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public BookingDTO getBookingById(Connection connection, int bookingId) throws Exception {
+    public Booking getBookingById(Connection connection, int bookingId) throws Exception {
         String sql = "SELECT * FROM booking WHERE booking_id = ?";
         try (PreparedStatement pstm = connection.prepareStatement(sql)) {
             pstm.setInt(1, bookingId);
             try (ResultSet rs = pstm.executeQuery()) {
                 if (rs.next()) {
-                    BookingDTO dto = new BookingDTO();
-                    dto.setBookingId(rs.getInt("booking_id"));
-                    dto.setUserId(rs.getInt("user_id"));
-                    dto.setCarId(rs.getInt("car_id"));
-                    dto.setDriverId(rs.getInt("driver_id"));
-                    dto.setPickupLocation(rs.getString("pickup_location"));
-                    dto.setDropLocation(rs.getString("drop_location"));
-                    dto.setBookingDateTime(rs.getTimestamp("booking_datetime"));
-                    dto.setCustomerName(rs.getString("customer_name"));
-                    dto.setCustomerEmail(rs.getString("customer_email"));
-                    dto.setCustomerPhone(rs.getString("customer_phone"));
-                    dto.setStatus(rs.getString("status"));
-                    return dto;
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getInt("booking_id"));
+                    booking.setUserId(rs.getInt("user_id"));
+                    booking.setCarId(rs.getInt("car_id"));
+                    booking.setDriverId(rs.getInt("driver_id"));
+                    booking.setPickupLocation(rs.getString("pickup_location"));
+                    booking.setDropLocation(rs.getString("drop_location"));
+                    booking.setBookingDateTime(rs.getTimestamp("booking_datetime"));
+                    booking.setCustomerName(rs.getString("customer_name"));
+                    booking.setCustomerEmail(rs.getString("customer_email"));
+                    booking.setCustomerPhone(rs.getString("customer_phone"));
+                    booking.setStatus(rs.getString("status"));
+                    return booking;
                 }
             }
         }
@@ -317,6 +318,48 @@ public class BookingDAOImpl implements BookingDAO {
         return "N/A";
     }
 
+    @Override
+    public List<BookingDTO> getBookingsWithDetailsByUserId(Connection connection, int userId) throws Exception {
+        String sql = "SELECT b.*, c.*, d.*, p.* " +
+                "FROM booking b " +
+                "LEFT JOIN car c ON b.car_id = c.car_id " +
+                "LEFT JOIN driver d ON b.driver_id = d.driver_id " +
+                "LEFT JOIN payment p ON b.booking_id = p.booking_id " +
+                "WHERE b.user_id = ? order by p.payment_date DESC";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<BookingDTO> bookings = new ArrayList<>();
+                while (rs.next()) {
+
+                    BookingDTO bookingDTO = new BookingDTO();
+                    bookingDTO.setBookingId(rs.getInt("booking_id"));
+                    bookingDTO.setUserId(rs.getInt("user_id"));
+                    bookingDTO.setCarId(rs.getInt("car_id"));
+                    bookingDTO.setDriverId(rs.getInt("driver_id"));
+                    bookingDTO.setPickupLocation(rs.getString("pickup_location"));
+                    bookingDTO.setDropLocation(rs.getString("drop_location"));
+                    bookingDTO.setBookingDateTime(rs.getTimestamp("booking_datetime"));
+                    bookingDTO.setCustomerName(rs.getString("customer_name"));
+                    bookingDTO.setCustomerEmail(rs.getString("customer_email"));
+                    bookingDTO.setCustomerPhone(rs.getString("customer_phone"));
+                    bookingDTO.setStatus(rs.getString("status"));
+
+
+                    PaymentDTO paymentDTO = new PaymentDTO();
+                    paymentDTO.setPaymentId(rs.getInt("payment_id"));
+                    paymentDTO.setAmount(rs.getDouble("amount"));
+                    paymentDTO.setPaymentMethod(rs.getString("payment_method"));
+                    paymentDTO.setPaymentStatus(rs.getString("payment_status"));
+                    paymentDTO.setPaymentDate(rs.getTimestamp("payment_date"));
+                    bookingDTO.setPayment(paymentDTO);
+
+                    bookings.add(bookingDTO);
+                }
+                return bookings;
+            }
+        }
+    }
 
 
 }

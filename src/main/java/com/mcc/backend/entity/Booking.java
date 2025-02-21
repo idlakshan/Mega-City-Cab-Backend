@@ -2,6 +2,8 @@ package com.mcc.backend.entity;
 
 
 
+import com.mcc.backend.dto.PaymentDTO;
+
 import java.sql.Timestamp;
 
 public class Booking {
@@ -20,10 +22,12 @@ public class Booking {
     private Car car;
     private Driver driver;
 
+    private Payment payment;
+
     public Booking() {
     }
 
-    public Booking(int bookingId, int userId, int carId, int driverId, String pickupLocation, String dropLocation, Timestamp bookingDateTime, String customerName, String customerEmail, String customerPhone, String status, Car car, Driver driver) {
+    public Booking(int bookingId, int userId, int carId, int driverId, String pickupLocation, String dropLocation, Timestamp bookingDateTime, String customerName, String customerEmail, String customerPhone, String status, Car car, Driver driver, Payment payment) {
         this.bookingId = bookingId;
         this.userId = userId;
         this.carId = carId;
@@ -37,6 +41,7 @@ public class Booking {
         this.status = status;
         this.car = car;
         this.driver = driver;
+        this.payment = payment;
     }
 
     public int getBookingId() {
@@ -141,5 +146,13 @@ public class Booking {
 
     public void setDriver(Driver driver) {
         this.driver = driver;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }

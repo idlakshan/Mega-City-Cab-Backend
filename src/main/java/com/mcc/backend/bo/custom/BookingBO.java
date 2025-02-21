@@ -24,4 +24,5 @@ public interface BookingBO {
     double getTotalSpendingByUserId(int userId) throws Exception;
     String getActiveSinceByUserId(int userId) throws Exception;
     String getFavoriteLocationByUserId(int userId) throws Exception;
+    List<BookingDTO> getBookingsDetailsByUserId(int userId) throws Exception;
 }
