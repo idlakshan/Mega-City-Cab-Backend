@@ -289,25 +289,28 @@ public class BookingServlet extends HttpServlet {
                 e.printStackTrace();
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
             }
-        }else if (pathInfo.startsWith("/user-stats/")) {
+        }else if (pathInfo.startsWith("/user-stats")) {
             Jws<Claims> claims = Security.isValidJWT(req, resp);
             if (claims == null) {
-                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.", null, null);
-                return;
-            }
-
-            String[] pathParts = pathInfo.split("/");
-            if (pathParts.length < 3) {
-                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid path format. Expected /user-stats/{userId}.", null, null);
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Unauthorized access. Invalid or missing JWT.", null, null);
                 return;
             }
 
             try {
-                int userId = Integer.parseInt(pathParts[2]);
+                // Extract userId from JWT claims
+                int userId = (int) claims.getBody().get("userId");
+                System.out.println(userId);
+
                 int totalRides = bookingBO.getTotalBookingsByUserId(userId);
                 double totalSpending = bookingBO.getTotalSpendingByUserId(userId);
+
+                // Set default values if null
                 String activeSince = bookingBO.getActiveSinceByUserId(userId);
+                activeSince = (activeSince != null) ? activeSince : "2025";  // Default to "2025" if null
+
                 String favoriteLocation = bookingBO.getFavoriteLocationByUserId(userId);
+                favoriteLocation = (favoriteLocation != null) ? favoriteLocation : "No current locations";  // Default text if null
 
                 JsonObject data = Json.createObjectBuilder()
                         .add("totalRides", totalRides)
@@ -316,13 +319,16 @@ public class BookingServlet extends HttpServlet {
                         .add("favoriteLocation", favoriteLocation)
                         .build();
 
-                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "User stats retrieved successfully!", data, null);
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK,
+                        "User stats retrieved successfully!", data, null);
             } catch (NumberFormatException e) {
                 e.printStackTrace();
-                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format.", null, e.getMessage());
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid user ID format in JWT.", null, e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
-                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        "Database error.", null, e.getMessage());
             }
         }
         else {

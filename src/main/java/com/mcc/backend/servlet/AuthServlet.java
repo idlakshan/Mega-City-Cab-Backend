@@ -81,7 +81,7 @@ public class AuthServlet extends HttpServlet {
                                     .toString()
                     );
                 } else {
-                    response.setContentType("application/json"); // Set response type to JSON
+                    response.setContentType("application/json");
                     response.getWriter().write(
                             Json.createObjectBuilder()
                                     .add("status", "error")
@@ -109,6 +109,7 @@ public class AuthServlet extends HttpServlet {
                     if (userDTO != null) {
                         response.setContentType("application/json");
                         response.getWriter().write(Json.createObjectBuilder()
+                                .add("id", userId)
                                 .add("name", userDTO.getName())
                                 .add("email", userDTO.getEmail())
                                 .add("phone", userDTO.getPhone())
@@ -124,7 +125,7 @@ public class AuthServlet extends HttpServlet {
             }
         } else if (path.equals("/all-users")) {
             try {
-                Jws<Claims> claims = Security.isValidAdminJWT(request, response); // Ensure only admins can access
+                Jws<Claims> claims = Security.isValidAdminJWT(request, response);
                 if (claims == null) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.");
                     return;
@@ -139,7 +140,7 @@ public class AuthServlet extends HttpServlet {
                             .add("nic", user.getNic())
                             .add("phone", user.getPhone())
                             .add("email", user.getEmail())
-                            .add("role", Json.createObjectBuilder() // Include role
+                            .add("role", Json.createObjectBuilder()
                                     .add("id", user.getRole().getId())
                                     .add("name", user.getRole().getName())));
                 }
@@ -164,13 +165,13 @@ public class AuthServlet extends HttpServlet {
 
         if (path != null && path.startsWith("/delete/")) {
             try {
-                Jws<Claims> claims = Security.isValidAdminJWT(request, response); // Ensure only admins can delete users
+                Jws<Claims> claims = Security.isValidAdminJWT(request, response);
                 if (claims == null) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.");
                     return;
                 }
 
-                int userId = Integer.parseInt(path.split("/")[2]); // Extract user ID from the path
+                int userId = Integer.parseInt(path.split("/")[2]);
                 boolean isDeleted = authBO.deleteUser(userId);
 
                 if (isDeleted) {
