@@ -2,6 +2,7 @@ package com.mcc.backend.bo.custom;
 
 import com.mcc.backend.dto.DriverDTO;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -14,4 +15,5 @@ public interface DriverBO {
     List<DriverDTO> getAvailableDrivers() throws Exception;
     int getActiveDrivers() throws SQLException, ClassNotFoundException;
     void updateDriverStatus(DriverDTO driverDTO) throws Exception;
+
 }

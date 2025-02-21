@@ -113,7 +113,7 @@ public class VehicleServlet extends HttpServlet {
             String pathInfo = req.getPathInfo();
 
             if (pathInfo == null || pathInfo.equals("/")) {
-                // Fetch all vehicles
+             
                 try {
                     List<CarDTO> vehicles = carBO.getAllVehicles();
                     JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();

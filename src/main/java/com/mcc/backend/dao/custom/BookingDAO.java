@@ -10,9 +10,15 @@ import java.util.Map;
 
 public interface BookingDAO {
     int save(Connection connection, Booking booking) throws Exception;
-    List<BookingDTO> getAllBookings(Connection connection) throws Exception;
+    List<Booking> getAllBookings(Connection connection) throws Exception;
     List<BookingDTO> getBookingsByUserId(Connection connection, int userId) throws Exception;
     int getTotalBookings(Connection conn) throws SQLException, ClassNotFoundException;
     double getTotalRevenue(Connection conn) throws SQLException, ClassNotFoundException;
     Map<String, Integer> getBookingCountsLast7Days(Connection conn) throws SQLException, ClassNotFoundException;
+    List<Booking> getBookingsByStatus(Connection conn, String status) throws Exception;
+
+    void updateBookingStatus(Connection connection, int bookingId, String status) throws Exception;
+    void updateBookingCarStatus(Connection connection, int carId, String status) throws Exception;
+    void updateBookingDriverStatus(Connection connection, int driverId, String status) throws Exception;
+    BookingDTO getBookingById(Connection connection, int bookingId) throws Exception;
 }

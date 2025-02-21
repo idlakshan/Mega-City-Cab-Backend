@@ -1,19 +1,20 @@
 package com.mcc.backend.bo.custom.impl;
 
 import com.mcc.backend.bo.custom.BookingBO;
+import com.mcc.backend.bo.custom.CarBO;
+import com.mcc.backend.bo.custom.DriverBO;
 import com.mcc.backend.dao.custom.BookingDAO;
 import com.mcc.backend.dao.custom.impl.BookingDAOImpl;
 import com.mcc.backend.dto.BookingDTO;
+import com.mcc.backend.dto.CarDTO;
+import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.entity.Booking;
 import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.StripeCheckoutServlet;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +45,45 @@ public class BookingBOImpl implements BookingBO {
     @Override
     public List<BookingDTO> getAllBookings() throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
-            return bookingDAO.getAllBookings(conn);
+            List<Booking> bookingsByStatus = bookingDAO.getAllBookings(conn);
+            List<BookingDTO> bookingDTOs = new ArrayList<>();
+
+            for (Booking booking : bookingsByStatus) {
+                BookingDTO dto = new BookingDTO();
+                dto.setBookingId(booking.getBookingId());
+                dto.setUserId(booking.getUserId());
+                dto.setPickupLocation(booking.getPickupLocation());
+                dto.setDropLocation(booking.getDropLocation());
+                dto.setBookingDateTime(booking.getBookingDateTime());
+                dto.setCustomerName(booking.getCustomerName());
+                dto.setCustomerEmail(booking.getCustomerEmail());
+                dto.setCustomerPhone(booking.getCustomerPhone());
+                dto.setStatus(booking.getStatus());
+
+
+                if (booking.getCar() != null) {
+                    CarDTO carDTO = new CarDTO();
+                    carDTO.setCarId(booking.getCar().getCarId());
+                    carDTO.setCarName(booking.getCar().getCarName());
+                    carDTO.setCarNumber(booking.getCar().getCarNumber());
+                    dto.setCar(carDTO);
+                }
+
+                if (booking.getDriver() != null) {
+                    DriverDTO driverDTO = new DriverDTO();
+                    driverDTO.setDriverId(booking.getDriver().getDriverId());
+                    driverDTO.setDriverName(booking.getDriver().getDriverName());
+                    driverDTO.setDriverNic(booking.getDriver().getDriverNic());
+                    dto.setDriver(driverDTO);
+                }
+
+                bookingDTOs.add(dto);
+            }
+
+            return bookingDTOs;
         }
     }
+
 
     @Override
     public List<BookingDTO> getBookingsByUserId(int userId) throws Exception {
@@ -73,6 +110,76 @@ public class BookingBOImpl implements BookingBO {
     public Map<String, Integer> getBookingCountsLast7Days() throws SQLException, ClassNotFoundException {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
             return bookingDAO.getBookingCountsLast7Days(conn);
+        }
+    }
+
+    @Override
+    public List<BookingDTO> getBookingsByStatus(String status) throws Exception {
+        try (Connection conn = BookingServlet.dataSource.getConnection()) {
+            List<Booking> bookingsByStatus = bookingDAO.getBookingsByStatus(conn, status);
+            List<BookingDTO> bookingDTOs = new ArrayList<>();
+
+            for (Booking booking : bookingsByStatus) {
+                BookingDTO dto = new BookingDTO();
+                dto.setBookingId(booking.getBookingId());
+                dto.setUserId(booking.getUserId());
+                dto.setPickupLocation(booking.getPickupLocation());
+                dto.setDropLocation(booking.getDropLocation());
+                dto.setBookingDateTime(booking.getBookingDateTime());
+                dto.setCustomerName(booking.getCustomerName());
+                dto.setCustomerEmail(booking.getCustomerEmail());
+                dto.setCustomerPhone(booking.getCustomerPhone());
+                dto.setStatus(booking.getStatus());
+
+
+                if (booking.getCar() != null) {
+                    CarDTO carDTO = new CarDTO();
+                    carDTO.setCarId(booking.getCar().getCarId());
+                    carDTO.setCarName(booking.getCar().getCarName());
+                    carDTO.setCarNumber(booking.getCar().getCarNumber());
+                    dto.setCar(carDTO);
+                }
+
+                if (booking.getDriver() != null) {
+                    DriverDTO driverDTO = new DriverDTO();
+                    driverDTO.setDriverId(booking.getDriver().getDriverId());
+                    driverDTO.setDriverName(booking.getDriver().getDriverName());
+                    driverDTO.setDriverNic(booking.getDriver().getDriverNic());
+                    dto.setDriver(driverDTO);
+                }
+
+                bookingDTOs.add(dto);
+            }
+
+            return bookingDTOs;
+        }
+    }
+
+    @Override
+    public void updateBookingStatus(int bookingId, String status) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            bookingDAO.updateBookingStatus(connection, bookingId, status);
+        }
+    }
+
+    @Override
+    public void updateBookingCarStatus(int carId, String status) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            bookingDAO.updateBookingCarStatus(connection, carId, status);
+        }
+    }
+
+    @Override
+    public void updateBookingDriverStatus(int driverId, String status) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            bookingDAO.updateBookingDriverStatus(connection, driverId, status);
+        }
+    }
+
+    @Override
+    public BookingDTO getBookingById(int bookingId) throws Exception {
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            return bookingDAO.getBookingById(connection, bookingId);
         }
     }
 

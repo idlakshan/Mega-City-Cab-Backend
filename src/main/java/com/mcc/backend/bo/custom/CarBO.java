@@ -3,6 +3,7 @@ package com.mcc.backend.bo.custom;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -16,4 +17,5 @@ public interface CarBO {
    List<CarDTO> getAvailableVehiclesByCategory(int categoryId) throws Exception;
    int getAvailableVehicles() throws SQLException, ClassNotFoundException;
    void updateCarStatus(CarDTO carDTO) throws Exception;
+
 }

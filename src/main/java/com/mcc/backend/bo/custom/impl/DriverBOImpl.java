@@ -133,4 +133,7 @@ public class DriverBOImpl implements DriverBO {
     public void updateDriverStatus(DriverDTO driverDTO) throws Exception {
         driverDAO.updateDriverStatus(driverDTO);
     }
+
+
+
 }

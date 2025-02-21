@@ -13,4 +13,10 @@ public interface BookingBO {
     int getTotalBookings() throws Exception;
     double getTotalRevenue() throws Exception;
     Map<String, Integer> getBookingCountsLast7Days() throws Exception;
+    List<BookingDTO> getBookingsByStatus(String status) throws Exception;
+
+    void updateBookingStatus(int bookingId, String status) throws Exception;
+    void updateBookingCarStatus(int carId, String status) throws Exception;
+    void updateBookingDriverStatus(int driverId, String status) throws Exception;
+    BookingDTO getBookingById(int bookingId) throws Exception;
 }

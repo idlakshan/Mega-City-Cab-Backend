@@ -15,10 +15,13 @@ public class BookingDTO {
     private String customerPhone;
     private String status;
 
+    private CarDTO car;
+    private DriverDTO driver;
+
     public BookingDTO() {
     }
 
-    public BookingDTO(int bookingId, int userId, int carId, int driverId, String pickupLocation, String dropLocation, Timestamp bookingDateTime, String customerName, String customerEmail, String customerPhone, String status) {
+    public BookingDTO(int bookingId, int userId, int carId, int driverId, String pickupLocation, String dropLocation, Timestamp bookingDateTime, String customerName, String customerEmail, String customerPhone, String status, CarDTO car, DriverDTO driver) {
         this.bookingId = bookingId;
         this.userId = userId;
         this.carId = carId;
@@ -30,6 +33,8 @@ public class BookingDTO {
         this.customerEmail = customerEmail;
         this.customerPhone = customerPhone;
         this.status = status;
+        this.car = car;
+        this.driver = driver;
     }
 
     public int getBookingId() {
@@ -118,5 +123,21 @@ public class BookingDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public CarDTO getCar() {
+        return car;
+    }
+
+    public void setCar(CarDTO car) {
+        this.car = car;
+    }
+
+    public DriverDTO getDriver() {
+        return driver;
+    }
+
+    public void setDriver(DriverDTO driver) {
+        this.driver = driver;
     }
 }

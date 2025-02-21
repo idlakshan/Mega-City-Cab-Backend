@@ -17,4 +17,5 @@ public interface CarDAO {
     List<Car> getAvailableVehiclesByCategory(Connection conn, int categoryId) throws Exception;
     int getAvailableVehicles(Connection conn) throws SQLException, ClassNotFoundException;
     void updateCarStatus(CarDTO carDTO) throws Exception;
+
 }

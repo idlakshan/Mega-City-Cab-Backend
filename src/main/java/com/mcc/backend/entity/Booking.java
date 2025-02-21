@@ -1,5 +1,7 @@
 package com.mcc.backend.entity;
 
+
+
 import java.sql.Timestamp;
 
 public class Booking {
@@ -15,10 +17,13 @@ public class Booking {
     private String customerPhone;
     private String status;
 
+    private Car car;
+    private Driver driver;
+
     public Booking() {
     }
 
-    public Booking(int bookingId, int userId, int carId, int driverId, String pickupLocation, String dropLocation, Timestamp bookingDateTime, String customerName, String customerEmail, String customerPhone, String status) {
+    public Booking(int bookingId, int userId, int carId, int driverId, String pickupLocation, String dropLocation, Timestamp bookingDateTime, String customerName, String customerEmail, String customerPhone, String status, Car car, Driver driver) {
         this.bookingId = bookingId;
         this.userId = userId;
         this.carId = carId;
@@ -30,6 +35,8 @@ public class Booking {
         this.customerEmail = customerEmail;
         this.customerPhone = customerPhone;
         this.status = status;
+        this.car = car;
+        this.driver = driver;
     }
 
     public int getBookingId() {
@@ -118,5 +125,21 @@ public class Booking {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 }

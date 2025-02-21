@@ -101,9 +101,45 @@ public class BookingServlet extends HttpServlet {
 
             try {
                 List<BookingDTO> allBookings = bookingBO.getAllBookings();
-                JsonObject response = buildBookingResponse(allBookings);
-                resp.setContentType("application/json");
-                resp.getWriter().write(response.toString());
+                JsonArrayBuilder bookingsArrayBuilder = Json.createArrayBuilder();
+                for (BookingDTO booking : allBookings) {
+                    JsonObjectBuilder bookingBuilder = Json.createObjectBuilder()
+                            .add("bookingId", booking.getBookingId())
+                            .add("userId", booking.getUserId())
+                            .add("pickupLocation", booking.getPickupLocation())
+                            .add("dropLocation", booking.getDropLocation())
+                            .add("bookingDateTime", booking.getBookingDateTime().toString())
+                            .add("customerName", booking.getCustomerName())
+                            .add("customerEmail", booking.getCustomerEmail())
+                            .add("customerPhone", booking.getCustomerPhone())
+                            .add("status", booking.getStatus());
+
+                    CarDTO car = booking.getCar();
+                    if (car != null) {
+                        JsonObjectBuilder carBuilder = Json.createObjectBuilder()
+                                .add("carId", car.getCarId())
+                                .add("carName", car.getCarName())
+                                .add("carNumber", car.getCarNumber());
+                        bookingBuilder.add("car", carBuilder);
+                    }
+
+                    DriverDTO driver = booking.getDriver();
+                    if (driver != null) {
+                        JsonObjectBuilder driverBuilder = Json.createObjectBuilder()
+                                .add("driverId", driver.getDriverId())
+                                .add("driverName", driver.getDriverName())
+                                .add("driverNic", driver.getDriverNic());
+                        bookingBuilder.add("driver", driverBuilder);
+                    }
+
+                    bookingsArrayBuilder.add(bookingBuilder);
+                }
+
+                JsonObject response = Json.createObjectBuilder()
+                        .add("bookings", bookingsArrayBuilder)
+                        .build();
+
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "All Bookings retrieved successfully!", response, null);
             } catch (Exception e) {
                 e.printStackTrace();
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
@@ -155,8 +191,6 @@ public class BookingServlet extends HttpServlet {
 
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Statistics retrieved successfully!", data, null);
 
-                    resp.setContentType("application/json");
-                   // resp.getWriter().write(response.toString());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -194,12 +228,108 @@ public class BookingServlet extends HttpServlet {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
                 }
             }
-        }
+        }else if (pathInfo.startsWith("/status")) {
+            Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
+            if (claims != null) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.", null, null);
+                return;
+            }
 
+            String[] pathParts = pathInfo.split("/");
+            if (pathParts.length < 3) {
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid path format. Expected /status/{status}.", null, null);
+                return;
+            }
+
+            try {
+                String status = pathParts[2];
+                List<BookingDTO> bookingsByStatus = bookingBO.getBookingsByStatus(status);
+
+                JsonArrayBuilder bookingsArrayBuilder = Json.createArrayBuilder();
+                for (BookingDTO booking : bookingsByStatus) {
+                    JsonObjectBuilder bookingBuilder = Json.createObjectBuilder()
+                            .add("bookingId", booking.getBookingId())
+                            .add("userId", booking.getUserId())
+                            .add("pickupLocation", booking.getPickupLocation())
+                            .add("dropLocation", booking.getDropLocation())
+                            .add("bookingDateTime", booking.getBookingDateTime().toString())
+                            .add("customerName", booking.getCustomerName())
+                            .add("customerEmail", booking.getCustomerEmail())
+                            .add("customerPhone", booking.getCustomerPhone())
+                            .add("status", booking.getStatus());
+
+                    CarDTO car = booking.getCar();
+                    if (car != null) {
+                        JsonObjectBuilder carBuilder = Json.createObjectBuilder()
+                                .add("carId", car.getCarId())
+                                .add("carName", car.getCarName())
+                                .add("carNumber", car.getCarNumber());
+                        bookingBuilder.add("car", carBuilder);
+                    }
+
+                    DriverDTO driver = booking.getDriver();
+                    if (driver != null) {
+                        JsonObjectBuilder driverBuilder = Json.createObjectBuilder()
+                                .add("driverId", driver.getDriverId())
+                                .add("driverName", driver.getDriverName())
+                                .add("driverNic", driver.getDriverNic());
+                        bookingBuilder.add("driver", driverBuilder);
+                    }
+
+                    bookingsArrayBuilder.add(bookingBuilder);
+                }
+
+                JsonObject response = Json.createObjectBuilder()
+                        .add("bookings", bookingsArrayBuilder)
+                        .build();
+
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "InProgress Bookings retrieved successfully!", response, null);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
+            }
+        }
         else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
+        if (claims != null) {
+            JsonObject requestBody = Json.createReader(req.getReader()).readObject();
+            int bookingId = requestBody.getInt("bookingId");
+            String status = requestBody.getString("status");
+
+            try {
+                if ("Completed".equals(status)) {
+                    // Update booking status to Completed
+                    bookingBO.updateBookingStatus(bookingId, status);
+
+                    // Get the booking details
+                    BookingDTO booking = bookingBO.getBookingById(bookingId);
+
+                    // Update car status to Available
+                    bookingBO.updateBookingCarStatus(booking.getCarId(), "Available");
+
+                    // Update driver status to Available
+                    bookingBO.updateBookingDriverStatus(booking.getDriverId(), "Available");
+
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Booking status updated to Completed and car/driver status updated to Available.", null, null);
+                } else {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid status update.", null, null);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.", null, e.getMessage());
+            }
+        }
+
+    }
+
+
 
     private JsonObject buildBookingResponse(List<BookingDTO> bookings) {
         JsonArrayBuilder bookingsArray = Json.createArrayBuilder();
