@@ -1,12 +1,13 @@
 package com.mcc.backend.bo.custom.impl;
 
 import com.mcc.backend.bo.custom.DriverBO;
-import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.dao.custom.DriverDAO;
 import com.mcc.backend.dao.custom.impl.DriverDAOImpl;
+import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.entity.Driver;
 import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.DriverServlet;
+import com.mcc.backend.servlet.StripeCheckoutServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,26 +21,24 @@ public class DriverBOImpl implements DriverBO {
     @Override
     public boolean saveDriver(DriverDTO driverDTO) throws SQLException, ClassNotFoundException {
         try (Connection conn = DriverServlet.dataSource.getConnection()) {
-
             Driver driver = new Driver();
             driver.setDriverName(driverDTO.getDriverName());
             driver.setDriverNic(driverDTO.getDriverNic());
             driver.setDriverAddress(driverDTO.getDriverAddress());
             driver.setDriverEmail(driverDTO.getDriverEmail());
-            driver.setDriverEmail(driverDTO.getDriverEmail());
             driver.setLicenseImage(driverDTO.getLicenseImage());
             driver.setDriverContact(driverDTO.getDriverContact());
-            return driverDAO.saveDriver(conn, driver);
+            return driverDAO.save(conn, driver);
         }
     }
 
     @Override
     public List<DriverDTO> getAllDrivers() throws SQLException, ClassNotFoundException {
         try (Connection conn = DriverServlet.dataSource.getConnection()) {
-            List<Driver> drivers = driverDAO.getAllDrivers(conn);
+            List<Driver> drivers = driverDAO.findAll(conn);
             List<DriverDTO> driverDTOs = new ArrayList<>();
             for (Driver driver : drivers) {
-                driverDTOs.add(new DriverDTO(
+                DriverDTO driverDTO = new DriverDTO(
                         driver.getDriverId(),
                         driver.getDriverName(),
                         driver.getDriverNic(),
@@ -48,7 +47,8 @@ public class DriverBOImpl implements DriverBO {
                         driver.getLicenseImage(),
                         driver.getDriverContact(),
                         driver.getStatus()
-                ));
+                );
+                driverDTOs.add(driverDTO);
             }
             return driverDTOs;
         }
@@ -57,7 +57,7 @@ public class DriverBOImpl implements DriverBO {
     @Override
     public DriverDTO getDriverById(int driverId) throws SQLException, ClassNotFoundException {
         try (Connection conn = DriverServlet.dataSource.getConnection()) {
-            Driver driver = driverDAO.getDriverById(conn, driverId);
+            Driver driver = driverDAO.findById(conn, driverId);
             if (driver != null) {
                 return new DriverDTO(
                         driver.getDriverId(),
@@ -75,26 +75,25 @@ public class DriverBOImpl implements DriverBO {
     }
 
     @Override
-    public boolean updateDriver(DriverDTO dto) throws SQLException, ClassNotFoundException {
+    public boolean updateDriver(DriverDTO driverDTO) throws SQLException, ClassNotFoundException {
         try (Connection conn = DriverServlet.dataSource.getConnection()) {
             Driver driver = new Driver();
-
-            driver.setDriverId(dto.getDriverId());
-            driver.setDriverName(dto.getDriverName());
-            driver.setDriverNic(dto.getDriverNic());
-            driver.setDriverAddress(dto.getDriverAddress());
-            driver.setDriverEmail(dto.getDriverEmail());
-            driver.setLicenseImage(dto.getLicenseImage());
-            driver.setDriverContact(dto.getDriverContact());
-            driver.setStatus(dto.getStatus());
-            return driverDAO.updateDriver(conn, driver);
+            driver.setDriverId(driverDTO.getDriverId());
+            driver.setDriverName(driverDTO.getDriverName());
+            driver.setDriverNic(driverDTO.getDriverNic());
+            driver.setDriverAddress(driverDTO.getDriverAddress());
+            driver.setDriverEmail(driverDTO.getDriverEmail());
+            driver.setLicenseImage(driverDTO.getLicenseImage());
+            driver.setDriverContact(driverDTO.getDriverContact());
+            driver.setStatus(driverDTO.getStatus());
+            return driverDAO.update(conn, driver);
         }
     }
 
     @Override
     public boolean deleteDriver(int driverId) throws SQLException, ClassNotFoundException {
         try (Connection conn = DriverServlet.dataSource.getConnection()) {
-            return driverDAO.deleteDriver(conn, driverId);
+            return driverDAO.delete(conn, driverId);
         }
     }
 
@@ -102,23 +101,21 @@ public class DriverBOImpl implements DriverBO {
     public List<DriverDTO> getAvailableDrivers() throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
             List<Driver> drivers = driverDAO.getAvailableDrivers(conn);
-
             List<DriverDTO> driverDTOs = new ArrayList<>();
             for (Driver driver : drivers) {
-                DriverDTO driverDTO = new DriverDTO();
-                driverDTO.setDriverId(driver.getDriverId());
-                driverDTO.setDriverName(driver.getDriverName());
-                driverDTO.setDriverNic(driver.getDriverNic());
-                driverDTO.setDriverAddress(driver.getDriverAddress());
-                driverDTO.setDriverEmail(driver.getDriverEmail());
-                driverDTO.setLicenseImage(driver.getLicenseImage());
-                driverDTO.setDriverContact(driver.getDriverContact());
-                driverDTO.setStatus(driver.getStatus());
+                DriverDTO driverDTO = new DriverDTO(
+                        driver.getDriverId(),
+                        driver.getDriverName(),
+                        driver.getDriverNic(),
+                        driver.getDriverAddress(),
+                        driver.getDriverEmail(),
+                        driver.getLicenseImage(),
+                        driver.getDriverContact(),
+                        driver.getStatus()
+                );
                 driverDTOs.add(driverDTO);
             }
-
             return driverDTOs;
-
         }
     }
 
@@ -131,12 +128,11 @@ public class DriverBOImpl implements DriverBO {
 
     @Override
     public void updateDriverStatus(DriverDTO driverDTO) throws Exception {
-        Driver driver = new Driver();
-        driver.setDriverId(driverDTO.getDriverId());
-        driver.setStatus(driverDTO.getStatus());
-        driverDAO.updateDriverStatus(driver);
+        try (Connection conn = StripeCheckoutServlet.dataSource.getConnection()) {
+            Driver driver = new Driver();
+            driver.setDriverId(driverDTO.getDriverId());
+            driver.setStatus(driverDTO.getStatus());
+            driverDAO.updateDriverStatus(conn,driver);
+        }
     }
-
-
-
 }
