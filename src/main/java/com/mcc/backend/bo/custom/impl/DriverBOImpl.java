@@ -131,7 +131,10 @@ public class DriverBOImpl implements DriverBO {
 
     @Override
     public void updateDriverStatus(DriverDTO driverDTO) throws Exception {
-        driverDAO.updateDriverStatus(driverDTO);
+        Driver driver = new Driver();
+        driver.setDriverId(driverDTO.getDriverId());
+        driver.setStatus(driverDTO.getStatus());
+        driverDAO.updateDriverStatus(driver);
     }
 
 

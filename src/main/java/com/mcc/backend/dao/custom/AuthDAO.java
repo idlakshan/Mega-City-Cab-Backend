@@ -14,7 +14,7 @@ public interface AuthDAO {
     void saveUserDetails(Connection connection, int userId, int roleId) throws SQLException;
     int findRoleIdByName(Connection connection, String roleName) throws SQLException;
     User findUserById(Connection connection, int userId) throws SQLException;
-    List<UserDTO> getAllUsers(Connection connection) throws SQLException;
+    List<User> getAllUsers(Connection connection) throws SQLException;
     boolean deleteUser(Connection connection, int userId) throws SQLException;
     void deleteUserDetails(Connection connection, int userId) throws SQLException;
     void deletePaymentsByUserId(Connection connection, int userId) throws SQLException;

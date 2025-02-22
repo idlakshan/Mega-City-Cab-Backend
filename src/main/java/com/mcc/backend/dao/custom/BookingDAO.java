@@ -27,5 +27,5 @@ public interface BookingDAO {
     String getActiveSinceByUserId(Connection connection,int userId);
     String getFavoriteLocationByUserId(Connection connection,int userId);
 
-    List<BookingDTO> getBookingsWithDetailsByUserId(Connection connection, int userId) throws Exception;
+    List<Booking> getBookingsWithDetailsByUserId(Connection connection, int userId) throws Exception;
 }

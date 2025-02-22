@@ -139,12 +139,12 @@ public class CarDAOImpl implements CarDAO {
     }
 
     @Override
-    public void updateCarStatus(CarDTO carDTO) throws Exception {
+    public void updateCarStatus(Car car) throws Exception {
         String sql = "UPDATE car SET status = ? WHERE car_id = ?";
         try (Connection connection = StripeCheckoutServlet.dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, carDTO.getStatus());
-            statement.setInt(2, carDTO.getCarId());
+            statement.setString(1, car.getStatus());
+            statement.setInt(2, car.getCarId());
             statement.executeUpdate();
         }
     }

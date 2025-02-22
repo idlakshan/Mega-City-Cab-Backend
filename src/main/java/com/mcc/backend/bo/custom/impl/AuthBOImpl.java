@@ -4,12 +4,14 @@ import com.mcc.backend.bo.custom.AuthBO;
 import com.mcc.backend.config.Security;
 import com.mcc.backend.dao.custom.AuthDAO;
 import com.mcc.backend.dao.custom.impl.AuthDAOImpl;
+import com.mcc.backend.dto.RoleDTO;
 import com.mcc.backend.dto.UserDTO;
 import com.mcc.backend.entity.User;
 import com.mcc.backend.servlet.AuthServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -117,7 +119,25 @@ public class AuthBOImpl implements AuthBO {
     @Override
     public List<UserDTO> getAllUsers() throws SQLException, ClassNotFoundException {
         try (Connection conn = AuthServlet.dataSource.getConnection()) {
-            return authDAO.getAllUsers(conn);
+            List<User> allUsers = authDAO.getAllUsers(conn);
+            List<UserDTO> userDTOList = new ArrayList<>();
+
+            for (User user : allUsers) {
+                UserDTO userDTO = new UserDTO();
+                userDTO.setId(user.getId());
+                userDTO.setName(user.getName());
+                userDTO.setNic(user.getNic());
+                userDTO.setPhone(user.getPhone());
+                userDTO.setEmail(user.getEmail());
+
+                RoleDTO roleDTO = new RoleDTO();
+                roleDTO.setId(user.getRole().getId());
+                roleDTO.setName(user.getRole().getName());
+                userDTO.setRole(roleDTO);
+                userDTOList.add(userDTO);
+
+            }
+            return userDTOList;
         }
     }
 

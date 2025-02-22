@@ -3,6 +3,7 @@ package com.mcc.backend.dao.custom.impl;
 import com.mcc.backend.dao.custom.AuthDAO;
 import com.mcc.backend.dto.RoleDTO;
 import com.mcc.backend.dto.UserDTO;
+import com.mcc.backend.entity.Role;
 import com.mcc.backend.entity.User;
 
 import java.sql.Connection;
@@ -106,22 +107,22 @@ public class AuthDAOImpl implements AuthDAO {
     }
 
     @Override
-    public List<UserDTO> getAllUsers(Connection connection) throws SQLException {
-        List<UserDTO> users = new ArrayList<>();
+    public List<User> getAllUsers(Connection connection) throws SQLException {
+        List<User> users = new ArrayList<>();
         String sql = "SELECT u.id, u.name, u.phone, u.nic, u.email, r.id AS role_id, r.name AS role FROM user u LEFT JOIN userdetails ud ON u.id = ud.user_id " +
                 "LEFT JOIN role r ON ud.role_id = r.id";
 
         try (PreparedStatement pstm = connection.prepareStatement(sql);
              ResultSet rs = pstm.executeQuery()) {
             while (rs.next()) {
-                UserDTO user = new UserDTO();
+                User user = new User();
                 user.setId(rs.getInt("id"));
                 user.setName(rs.getString("name"));
                 user.setNic(rs.getString("nic"));
                 user.setPhone(rs.getString("phone"));
                 user.setEmail(rs.getString("email"));
 
-                RoleDTO role = new RoleDTO();
+                Role role = new Role();
                 role.setId(rs.getInt("role_id"));
                 role.setName(rs.getString("role"));
                 user.setRole(role);

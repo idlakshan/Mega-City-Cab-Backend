@@ -8,6 +8,7 @@ import com.mcc.backend.dao.custom.impl.BookingDAOImpl;
 import com.mcc.backend.dto.BookingDTO;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.dto.DriverDTO;
+import com.mcc.backend.dto.PaymentDTO;
 import com.mcc.backend.entity.Booking;
 import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.StripeCheckoutServlet;
@@ -252,7 +253,36 @@ public class BookingBOImpl implements BookingBO {
     @Override
     public List<BookingDTO> getBookingsDetailsByUserId(int userId) throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
-            return bookingDAO.getBookingsWithDetailsByUserId(conn, userId);
+            List<Booking> bookingsWithDetailsByUserId = bookingDAO.getBookingsWithDetailsByUserId(conn, userId);
+
+            List<BookingDTO> bookingDTOs = new ArrayList<>();
+            for (Booking booking : bookingsWithDetailsByUserId) {
+                BookingDTO bookingDTO = new BookingDTO();
+                bookingDTO.setBookingId(booking.getBookingId());
+                bookingDTO.setUserId(booking.getUserId());
+                bookingDTO.setCarId(booking.getCarId());
+                bookingDTO.setDriverId(booking.getDriverId());
+                bookingDTO.setPickupLocation(booking.getPickupLocation());
+                bookingDTO.setDropLocation(booking.getDropLocation());
+                bookingDTO.setBookingDateTime(booking.getBookingDateTime());
+                bookingDTO.setCustomerName(booking.getCustomerName());
+                bookingDTO.setCustomerEmail(booking.getCustomerEmail());
+                bookingDTO.setCustomerPhone(booking.getCustomerPhone());
+                bookingDTO.setStatus(booking.getStatus());
+
+                PaymentDTO paymentDTO = new PaymentDTO();
+                paymentDTO.setPaymentId(booking.getPayment().getPaymentId());
+                paymentDTO.setAmount(booking.getPayment().getAmount());
+                paymentDTO.setPaymentMethod(booking.getPayment().getPaymentMethod());
+                paymentDTO.setPaymentStatus(booking.getPayment().getPaymentStatus());
+                paymentDTO.setPaymentDate(booking.getPayment().getPaymentDate());
+                bookingDTO.setPayment(paymentDTO);
+
+                bookingDTOs.add(bookingDTO);
+
+            }
+
+            return bookingDTOs;
         }
     }
 

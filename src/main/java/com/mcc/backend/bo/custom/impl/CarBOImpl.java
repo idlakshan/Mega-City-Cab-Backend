@@ -125,7 +125,10 @@ public class CarBOImpl implements CarBO {
 
     @Override
     public void updateCarStatus(CarDTO carDTO) throws Exception {
-        carDAO.updateCarStatus(carDTO);
+        Car car = new Car();
+        car.setCarId(carDTO.getCarId());
+        car.setStatus(carDTO.getStatus());
+        carDAO.updateCarStatus(car);
     }
 
 

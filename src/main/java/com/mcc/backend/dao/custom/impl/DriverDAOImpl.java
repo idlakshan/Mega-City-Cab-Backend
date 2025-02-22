@@ -142,12 +142,12 @@ public class DriverDAOImpl implements DriverDAO {
     }
 
     @Override
-    public void updateDriverStatus(DriverDTO driverDTO) throws Exception {
+    public void updateDriverStatus(Driver driver) throws Exception {
         String sql = "UPDATE driver SET status = ? WHERE driver_id = ?";
         try (Connection connection = StripeCheckoutServlet.dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, driverDTO.getStatus());
-            statement.setInt(2, driverDTO.getDriverId());
+            statement.setString(1, driver.getStatus());
+            statement.setInt(2, driver.getDriverId());
             statement.executeUpdate();
         }
     }

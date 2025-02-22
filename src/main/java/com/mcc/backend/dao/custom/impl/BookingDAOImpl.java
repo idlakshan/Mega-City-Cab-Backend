@@ -8,6 +8,7 @@ import com.mcc.backend.dto.PaymentDTO;
 import com.mcc.backend.entity.Booking;
 import com.mcc.backend.entity.Car;
 import com.mcc.backend.entity.Driver;
+import com.mcc.backend.entity.Payment;
 
 import java.sql.*;
 import java.util.*;
@@ -319,7 +320,7 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public List<BookingDTO> getBookingsWithDetailsByUserId(Connection connection, int userId) throws Exception {
+    public List<Booking> getBookingsWithDetailsByUserId(Connection connection, int userId) throws Exception {
         String sql = "SELECT b.*, c.*, d.*, p.* " +
                 "FROM booking b " +
                 "LEFT JOIN car c ON b.car_id = c.car_id " +
@@ -329,32 +330,32 @@ public class BookingDAOImpl implements BookingDAO {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
-                List<BookingDTO> bookings = new ArrayList<>();
+                List<Booking> bookings = new ArrayList<>();
                 while (rs.next()) {
 
-                    BookingDTO bookingDTO = new BookingDTO();
-                    bookingDTO.setBookingId(rs.getInt("booking_id"));
-                    bookingDTO.setUserId(rs.getInt("user_id"));
-                    bookingDTO.setCarId(rs.getInt("car_id"));
-                    bookingDTO.setDriverId(rs.getInt("driver_id"));
-                    bookingDTO.setPickupLocation(rs.getString("pickup_location"));
-                    bookingDTO.setDropLocation(rs.getString("drop_location"));
-                    bookingDTO.setBookingDateTime(rs.getTimestamp("booking_datetime"));
-                    bookingDTO.setCustomerName(rs.getString("customer_name"));
-                    bookingDTO.setCustomerEmail(rs.getString("customer_email"));
-                    bookingDTO.setCustomerPhone(rs.getString("customer_phone"));
-                    bookingDTO.setStatus(rs.getString("status"));
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getInt("booking_id"));
+                    booking.setUserId(rs.getInt("user_id"));
+                    booking.setCarId(rs.getInt("car_id"));
+                    booking.setDriverId(rs.getInt("driver_id"));
+                    booking.setPickupLocation(rs.getString("pickup_location"));
+                    booking.setDropLocation(rs.getString("drop_location"));
+                    booking.setBookingDateTime(rs.getTimestamp("booking_datetime"));
+                    booking.setCustomerName(rs.getString("customer_name"));
+                    booking.setCustomerEmail(rs.getString("customer_email"));
+                    booking.setCustomerPhone(rs.getString("customer_phone"));
+                    booking.setStatus(rs.getString("status"));
 
 
-                    PaymentDTO paymentDTO = new PaymentDTO();
-                    paymentDTO.setPaymentId(rs.getInt("payment_id"));
-                    paymentDTO.setAmount(rs.getDouble("amount"));
-                    paymentDTO.setPaymentMethod(rs.getString("payment_method"));
-                    paymentDTO.setPaymentStatus(rs.getString("payment_status"));
-                    paymentDTO.setPaymentDate(rs.getTimestamp("payment_date"));
-                    bookingDTO.setPayment(paymentDTO);
+                    Payment payment = new Payment();
+                    payment.setPaymentId(rs.getInt("payment_id"));
+                    payment.setAmount(rs.getDouble("amount"));
+                    payment.setPaymentMethod(rs.getString("payment_method"));
+                    payment.setPaymentStatus(rs.getString("payment_status"));
+                    payment.setPaymentDate(rs.getTimestamp("payment_date"));
+                    booking.setPayment(payment);
 
-                    bookings.add(bookingDTO);
+                    bookings.add(booking);
                 }
                 return bookings;
             }

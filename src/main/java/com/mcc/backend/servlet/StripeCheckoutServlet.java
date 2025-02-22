@@ -130,8 +130,6 @@ public class StripeCheckoutServlet extends HttpServlet {
             carDTO.setStatus("Booked");
             carBO.updateCarStatus(carDTO);
 
-
-
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setBookingId(bookingId);
             paymentDTO.setAmount(amount);
