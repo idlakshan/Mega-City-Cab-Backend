@@ -1,21 +1,15 @@
 package com.mcc.backend.dao.custom;
 
-import com.mcc.backend.dto.CarDTO;
+import com.mcc.backend.dao.CrudDAO;
 import com.mcc.backend.entity.Car;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CarDAO {
+public interface CarDAO extends CrudDAO<Car, Integer> {
     boolean isCarNumberExists(Connection conn, String carNumber) throws SQLException;
-    boolean saveCar(Connection conn, Car car) throws SQLException;
-    List<Car> getAllVehicles(Connection conn) throws SQLException, ClassNotFoundException;
-    boolean deleteCar(Connection conn, int carId) throws SQLException, ClassNotFoundException;
-    Car getVehicleById(Connection conn, int carId) throws SQLException, ClassNotFoundException;
-    boolean updateVehicle(Connection conn, Car car) throws SQLException, ClassNotFoundException;
     List<Car> getAvailableVehiclesByCategory(Connection conn, int categoryId) throws Exception;
     int getAvailableVehicles(Connection conn) throws SQLException, ClassNotFoundException;
-    void updateCarStatus(Car car) throws Exception;
-
+    void updateCarStatus(Connection conn,Car car) throws Exception;
 }

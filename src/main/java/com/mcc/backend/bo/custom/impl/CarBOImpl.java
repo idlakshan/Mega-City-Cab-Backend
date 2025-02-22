@@ -6,12 +6,12 @@ import com.mcc.backend.dao.custom.impl.CarDAOImpl;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
 import com.mcc.backend.servlet.BookingServlet;
+import com.mcc.backend.servlet.StripeCheckoutServlet;
 import com.mcc.backend.servlet.VehicleServlet;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class CarBOImpl implements CarBO {
@@ -19,98 +19,91 @@ public class CarBOImpl implements CarBO {
     private final CarDAO carDAO = new CarDAOImpl();
 
     @Override
-    public boolean saveCar(CarDTO dto) throws SQLException, ClassNotFoundException {
-        try (Connection conn = VehicleServlet.dataSource.getConnection()) {
-            if (carDAO.isCarNumberExists(conn, dto.getCarNumber())) {
-                throw new SQLException("Car number already exists");
-            }
-
+    public boolean saveCar(CarDTO carDTO) throws SQLException, ClassNotFoundException {
+        try (Connection connection = VehicleServlet.dataSource.getConnection()) {
             Car car = new Car();
-            car.setCategoryId(dto.getCategoryId());
-            car.setCarName(dto.getCarName());
-            car.setCarNumber(dto.getCarNumber());
-            car.setCarImage(dto.getCarImage());
-
-            return carDAO.saveCar(conn, car);
+            car.setCategoryId(carDTO.getCategoryId());
+            car.setCarName(carDTO.getCarName());
+            car.setCarNumber(carDTO.getCarNumber());
+            car.setCarImage(carDTO.getCarImage());
+            return carDAO.save(connection, car);
         }
     }
 
     @Override
     public List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException {
-        try (Connection conn = VehicleServlet.dataSource.getConnection()) {
-            List<Car> cars = carDAO.getAllVehicles(conn);
+        try (Connection connection = VehicleServlet.dataSource.getConnection()) {
+            List<Car> cars = carDAO.findAll(connection);
             List<CarDTO> carDTOs = new ArrayList<>();
 
             for (Car car : cars) {
-                CarDTO dto = new CarDTO();
-                dto.setCarId(car.getCarId());
-                dto.setCategoryId(car.getCategoryId());
-                dto.setCarName(car.getCarName());
-                dto.setCarNumber(car.getCarNumber());
-                dto.setCarImage(car.getCarImage());
-                dto.setStatus(car.getStatus());
-                carDTOs.add(dto);
+                CarDTO carDTO = new CarDTO();
+                carDTO.setCarId(car.getCarId());
+                carDTO.setCategoryId(car.getCategoryId());
+                carDTO.setCarName(car.getCarName());
+                carDTO.setCarNumber(car.getCarNumber());
+                carDTO.setCarImage(car.getCarImage());
+                carDTO.setStatus(car.getStatus());
+                carDTOs.add(carDTO);
             }
-
             return carDTOs;
         }
     }
 
     @Override
     public boolean deleteCar(int carId) throws SQLException, ClassNotFoundException {
-        try (Connection conn = VehicleServlet.dataSource.getConnection()) {
-            return carDAO.deleteCar(conn, carId);
+        try (Connection connection = VehicleServlet.dataSource.getConnection()) {
+            return carDAO.delete(connection, carId);
         }
     }
 
     @Override
     public CarDTO getVehicleById(int carId) throws SQLException, ClassNotFoundException {
-        try (Connection conn = VehicleServlet.dataSource.getConnection()) {
-            Car car = carDAO.getVehicleById(conn, carId);
-
+        try (Connection connection = VehicleServlet.dataSource.getConnection()) {
+            Car car = carDAO.findById(connection, carId);
             if (car != null) {
-                CarDTO dto = new CarDTO();
-                dto.setCarId(car.getCarId());
-                dto.setCategoryId(car.getCategoryId());
-                dto.setCarName(car.getCarName());
-                dto.setCarNumber(car.getCarNumber());
-                dto.setCarImage(car.getCarImage());
-                dto.setStatus(car.getStatus());
-                return dto;
+                CarDTO carDTO = new CarDTO();
+                carDTO.setCarId(car.getCarId());
+                carDTO.setCategoryId(car.getCategoryId());
+                carDTO.setCarName(car.getCarName());
+                carDTO.setCarNumber(car.getCarNumber());
+                carDTO.setCarImage(car.getCarImage());
+                carDTO.setStatus(car.getStatus());
+                return carDTO;
             }
             return null;
         }
     }
 
     @Override
-    public boolean updateVehicle(CarDTO dto) throws SQLException, ClassNotFoundException {
-        try (Connection conn = VehicleServlet.dataSource.getConnection()) {
+    public boolean updateVehicle(CarDTO carDTO) throws SQLException, ClassNotFoundException {
+        try (Connection connection = VehicleServlet.dataSource.getConnection()) {
             Car car = new Car();
-            car.setCategoryId(dto.getCategoryId());
-            car.setCarName(dto.getCarName());
-            car.setCarNumber(dto.getCarNumber());
-            car.setCarImage(dto.getCarImage());
-            car.setStatus(dto.getStatus());
-            car.setCarId(dto.getCarId());
-
-            return carDAO.updateVehicle(conn, car);
+            car.setCarId(carDTO.getCarId());
+            car.setCategoryId(carDTO.getCategoryId());
+            car.setCarName(carDTO.getCarName());
+            car.setCarNumber(carDTO.getCarNumber());
+            car.setCarImage(carDTO.getCarImage());
+            car.setStatus(carDTO.getStatus());
+            return carDAO.update(connection, car);
         }
     }
 
     @Override
     public List<CarDTO> getAvailableVehiclesByCategory(int categoryId) throws Exception {
-        try (Connection conn = BookingServlet.dataSource.getConnection()) {
-            List<Car> availableVehiclesByCategory = carDAO.getAvailableVehiclesByCategory(conn, categoryId);
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            List<Car> cars = carDAO.getAvailableVehiclesByCategory(connection, categoryId);
             List<CarDTO> carDTOs = new ArrayList<>();
-            for (Car car : availableVehiclesByCategory) {
-                CarDTO dto = new CarDTO();
-                dto.setCarId(car.getCarId());
-                dto.setCategoryId(car.getCategoryId());
-                dto.setCarName(car.getCarName());
-                dto.setCarNumber(car.getCarNumber());
-                dto.setCarImage(car.getCarImage());
-                dto.setStatus(car.getStatus());
-                carDTOs.add(dto);
+
+            for (Car car : cars) {
+                CarDTO carDTO = new CarDTO();
+                carDTO.setCarId(car.getCarId());
+                carDTO.setCategoryId(car.getCategoryId());
+                carDTO.setCarName(car.getCarName());
+                carDTO.setCarNumber(car.getCarNumber());
+                carDTO.setCarImage(car.getCarImage());
+                carDTO.setStatus(car.getStatus());
+                carDTOs.add(carDTO);
             }
             return carDTOs;
         }
@@ -118,20 +111,18 @@ public class CarBOImpl implements CarBO {
 
     @Override
     public int getAvailableVehicles() throws SQLException, ClassNotFoundException {
-        try (Connection conn = BookingServlet.dataSource.getConnection()) {
-            return carDAO.getAvailableVehicles(conn);
+        try (Connection connection = BookingServlet.dataSource.getConnection()) {
+            return carDAO.getAvailableVehicles(connection);
         }
     }
 
     @Override
     public void updateCarStatus(CarDTO carDTO) throws Exception {
-        Car car = new Car();
-        car.setCarId(carDTO.getCarId());
-        car.setStatus(carDTO.getStatus());
-        carDAO.updateCarStatus(car);
+        try (Connection connection = StripeCheckoutServlet.dataSource.getConnection()) {
+            Car car = new Car();
+            car.setCarId(carDTO.getCarId());
+            car.setStatus(carDTO.getStatus());
+            carDAO.updateCarStatus(connection,car);
+        }
     }
-
-
-
-
 }
