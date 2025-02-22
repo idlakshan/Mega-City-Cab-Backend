@@ -13,15 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryBOImpl implements CategoryBO {
+
     private final CategoryDAO categoryDAO = new CategoryDAOImpl();
 
     @Override
-    public List<CategoryDTO> getAllCategories(){
+    public List<CategoryDTO> getAllCategories() throws SQLException {
         List<CategoryDTO> categoryDTOs = new ArrayList<>();
-
         try (Connection connection = CategoryServlet.dataSource.getConnection()) {
-            List<Category> categories = categoryDAO.getAllCategories(connection);
-
+            List<Category> categories = categoryDAO.findAll(connection);
             for (Category category : categories) {
                 CategoryDTO categoryDTO = new CategoryDTO();
                 categoryDTO.setId(category.getId());
@@ -32,20 +31,15 @@ public class CategoryBOImpl implements CategoryBO {
                 categoryDTO.setPrice(category.getPrice());
                 categoryDTOs.add(categoryDTO);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
-
         return categoryDTOs;
     }
-
 
     @Override
     public List<CategoryDTO> getAllCategoryNames() throws SQLException {
         List<CategoryDTO> categoryDTOs = new ArrayList<>();
         try (Connection connection = CategoryServlet.dataSource.getConnection()) {
             List<Category> categories = categoryDAO.getAllCategoryNames(connection);
-
             for (Category category : categories) {
                 CategoryDTO categoryDTO = new CategoryDTO();
                 categoryDTO.setId(category.getId());

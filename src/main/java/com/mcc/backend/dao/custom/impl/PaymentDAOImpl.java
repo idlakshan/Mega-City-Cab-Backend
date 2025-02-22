@@ -2,21 +2,30 @@ package com.mcc.backend.dao.custom.impl;
 
 import com.mcc.backend.dao.custom.PaymentDAO;
 import com.mcc.backend.entity.Payment;
-import com.mcc.backend.servlet.BookingServlet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PaymentDAOImpl implements PaymentDAO {
 
     @Override
-    public void save(Connection connection, Payment payment) throws Exception {
+    public Payment findById(Connection connection, Integer id) throws SQLException {
+      return null;
+    }
+
+    @Override
+    public List<Payment> findAll(Connection connection) throws SQLException {
+       return null;
+    }
+
+    @Override
+    public boolean save(Connection connection, Payment payment) throws SQLException {
         String sql = "INSERT INTO payment (booking_id, amount, payment_method, payment_status, payment_date) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstm = connection.prepareStatement(sql)) {
             pstm.setInt(1, payment.getBookingId());
@@ -24,9 +33,18 @@ public class PaymentDAOImpl implements PaymentDAO {
             pstm.setString(3, payment.getPaymentMethod());
             pstm.setString(4, payment.getPaymentStatus());
             pstm.setTimestamp(5, payment.getPaymentDate());
-
-            pstm.executeUpdate();
+            return pstm.executeUpdate() > 0;
         }
+    }
+
+    @Override
+    public boolean update(Connection connection, Payment payment) throws SQLException {
+       return false;
+    }
+
+    @Override
+    public boolean delete(Connection connection, Integer id) throws SQLException {
+        return false;
     }
 
     @Override
@@ -44,27 +62,23 @@ public class PaymentDAOImpl implements PaymentDAO {
     }
 
     @Override
-    public Map<String, Double> getPaymentHistoryByUserId(Connection con,int userId) throws Exception{
-        String sql="SELECT DATE_FORMAT(payment_date, '%b') AS month, SUM(amount) AS total_amount " +
+    public Map<String, Double> getPaymentHistoryByUserId(Connection conn, int userId) throws Exception {
+        String sql = "SELECT DATE_FORMAT(payment_date, '%b') AS month, SUM(amount) AS total_amount " +
                 "FROM payment " +
                 "WHERE booking_id IN (SELECT booking_id FROM booking WHERE user_id = ?) " +
                 "GROUP BY DATE_FORMAT(payment_date, '%b')";
 
         Map<String, Double> paymentHistory = new HashMap<>();
-        try (PreparedStatement pstm = con.prepareStatement(sql)) {
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
             pstm.setInt(1, userId);
-            ResultSet rst = pstm.executeQuery();
-
-            while (rst.next()) {
-                String month = rst.getString("month");
-                double totalAmount = rst.getDouble("total_amount");
-                paymentHistory.put(month, totalAmount);
+            try (ResultSet rs = pstm.executeQuery()) {
+                while (rs.next()) {
+                    String month = rs.getString("month");
+                    double totalAmount = rs.getDouble("total_amount");
+                    paymentHistory.put(month, totalAmount);
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
         return paymentHistory;
     }
-
 }

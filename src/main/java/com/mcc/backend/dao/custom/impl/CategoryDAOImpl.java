@@ -1,6 +1,5 @@
 package com.mcc.backend.dao.custom.impl;
 
-
 import com.mcc.backend.dao.custom.CategoryDAO;
 import com.mcc.backend.entity.Category;
 
@@ -12,14 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryDAOImpl implements CategoryDAO {
+
     @Override
-    public List<Category> getAllCategories(Connection connection) throws SQLException {
+    public Category findById(Connection connection, Integer id) throws SQLException {
+      return null;
+    }
+
+    @Override
+    public List<Category> findAll(Connection connection) throws SQLException {
         List<Category> categories = new ArrayList<>();
         String query = "SELECT * FROM category";
 
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
-
             while (resultSet.next()) {
                 Category category = new Category();
                 category.setId(resultSet.getInt("id"));
@@ -31,18 +35,31 @@ public class CategoryDAOImpl implements CategoryDAO {
                 categories.add(category);
             }
         }
-
         return categories;
+    }
+
+    @Override
+    public boolean save(Connection connection, Category category) throws SQLException {
+      return false;
+    }
+
+    @Override
+    public boolean update(Connection connection, Category category) throws SQLException {
+      return false;
+    }
+
+    @Override
+    public boolean delete(Connection connection, Integer id) throws SQLException {
+       return false;
     }
 
     @Override
     public List<Category> getAllCategoryNames(Connection connection) throws SQLException {
         List<Category> categories = new ArrayList<>();
-        String query = "SELECT id,name FROM category";
+        String query = "SELECT id, name FROM category";
 
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
-
             while (resultSet.next()) {
                 Category category = new Category();
                 category.setId(resultSet.getInt("id"));
@@ -50,22 +67,16 @@ public class CategoryDAOImpl implements CategoryDAO {
                 categories.add(category);
             }
         }
-
         return categories;
     }
 
     @Override
     public boolean updateCategoryPrice(Connection connection, int id, double newPrice) throws SQLException {
         String query = "UPDATE category SET price = ? WHERE id = ?";
-
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setDouble(1, newPrice);
             statement.setInt(2, id);
-
-            int rowsUpdated = statement.executeUpdate();
-            return rowsUpdated > 0;
+            return statement.executeUpdate() > 0;
         }
     }
-
-
 }
