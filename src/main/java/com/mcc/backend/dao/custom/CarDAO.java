@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CarDAO {
     boolean isCarNumberExists(Connection conn, String carNumber) throws SQLException;
-    void saveCar(Connection conn, Car car) throws SQLException;
+    boolean saveCar(Connection conn, Car car) throws SQLException;
     List<Car> getAllVehicles(Connection conn) throws SQLException, ClassNotFoundException;
     boolean deleteCar(Connection conn, int carId) throws SQLException, ClassNotFoundException;
     Car getVehicleById(Connection conn, int carId) throws SQLException, ClassNotFoundException;

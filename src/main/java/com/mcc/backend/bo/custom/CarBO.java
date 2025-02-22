@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CarBO {
 
-   void saveCar(CarDTO car) throws SQLException, ClassNotFoundException;
+   boolean saveCar(CarDTO car) throws SQLException, ClassNotFoundException;
    List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException;
    boolean deleteCar(int carId) throws SQLException, ClassNotFoundException;
    CarDTO getVehicleById(int carId) throws SQLException, ClassNotFoundException;

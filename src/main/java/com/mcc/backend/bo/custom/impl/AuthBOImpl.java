@@ -12,7 +12,6 @@ import com.mcc.backend.servlet.AuthServlet;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class AuthBOImpl implements AuthBO {
@@ -21,49 +20,26 @@ public class AuthBOImpl implements AuthBO {
 
     @Override
     public String login(String email, String password) throws SQLException {
-        Connection connection = null;
-        try {
-            connection = AuthServlet.dataSource.getConnection();
-            connection.setAutoCommit(false);
-
+        try (Connection connection = AuthServlet.dataSource.getConnection()) {
             int userId = authDAO.findUserIdByEmailAndPassword(connection, email, password);
-            System.out.println(userId);
             if (userId == -1) {
-                connection.rollback();
-                return null;
+                throw new SQLException("Invalid email or password");
             }
 
             String role = authDAO.findRoleByUserId(connection, userId);
-            System.out.println(role);
             if (role == null) {
-                connection.rollback();
-                return null;
+                throw new SQLException("Role not found for user ID: " + userId);
             }
 
-            connection.commit();
-            String token = Security.createJWT(userId, role);
-
-            System.out.println("Generated Token in AuthBOImpl: " + token);
-            System.out.println(userId+" "+role);// Debug statement
-            return token;
-        } catch (SQLException e) {
-            if (connection != null) connection.rollback();
-            throw e;
-        } finally {
-            if (connection != null) {
-                connection.setAutoCommit(true);
-                connection.close();
-            }
+            return Security.createJWT(userId, role);
         }
     }
 
-    @Override
-    public boolean signUp(UserDTO userDTO) throws SQLException, ClassNotFoundException {
-        Connection connection = null;
-        try {
-            connection = AuthServlet.dataSource.getConnection();
-            connection.setAutoCommit(false);
 
+    @Override
+    public boolean signUp(UserDTO userDTO) throws SQLException {
+        try (Connection connection = AuthServlet.dataSource.getConnection()) {
+            connection.setAutoCommit(false);
 
             User user = new User();
             user.setName(userDTO.getName());
@@ -74,52 +50,43 @@ public class AuthBOImpl implements AuthBO {
 
             int userId = authDAO.saveUser(connection, user);
             if (userId == -1) {
-                connection.rollback();
-                return false;
+                throw new SQLException("Failed to save user");
             }
 
             int roleId = authDAO.findRoleIdByName(connection, "CUSTOMER");
             if (roleId == -1) {
-                connection.rollback();
-                return false;
+                throw new SQLException("Role 'CUSTOMER' not found");
             }
 
             authDAO.saveUserDetails(connection, userId, roleId);
             connection.commit();
             return true;
         } catch (SQLException e) {
-            if (connection != null) connection.rollback();
-            throw e;
-        } finally {
-            if (connection != null) {
-                connection.setAutoCommit(true);
-                connection.close();
-            }
+            throw new SQLException("Sign-up failed: " + e.getMessage(), e);
         }
     }
 
+
     @Override
     public UserDTO getUserById(int userId) throws SQLException {
-        Connection connection = null;
-        try {
-            connection = AuthServlet.dataSource.getConnection();
-            User user = authDAO.findUserById(connection, userId);
+        try (Connection connection = AuthServlet.dataSource.getConnection()) {
+            User user = authDAO.findById(connection, userId);
+            if (user == null) {
+                return null;
+            }
             UserDTO userDTO = new UserDTO();
             userDTO.setName(user.getName());
             userDTO.setEmail(user.getEmail());
             userDTO.setPhone(user.getPhone());
             return userDTO;
-        } finally {
-            if (connection != null) {
-                connection.close();
-            }
         }
     }
+
 
     @Override
     public List<UserDTO> getAllUsers() throws SQLException, ClassNotFoundException {
         try (Connection conn = AuthServlet.dataSource.getConnection()) {
-            List<User> allUsers = authDAO.getAllUsers(conn);
+            List<User> allUsers = authDAO.findAll(conn);
             List<UserDTO> userDTOList = new ArrayList<>();
 
             for (User user : allUsers) {
@@ -134,47 +101,28 @@ public class AuthBOImpl implements AuthBO {
                 roleDTO.setId(user.getRole().getId());
                 roleDTO.setName(user.getRole().getName());
                 userDTO.setRole(roleDTO);
-                userDTOList.add(userDTO);
 
+                userDTOList.add(userDTO);
             }
             return userDTOList;
         }
     }
 
     @Override
-    public boolean deleteUser(int userId) throws SQLException, ClassNotFoundException {
-        Connection connection = null;
-        try {
-            connection = AuthServlet.dataSource.getConnection();
-            connection.setAutoCommit(false); // Start transaction
+    public boolean deleteUser(int userId) throws SQLException {
+        try (Connection connection = AuthServlet.dataSource.getConnection()) {
+            connection.setAutoCommit(false);
 
-            // Step 1: Delete from userdetails
             authDAO.deleteUserDetails(connection, userId);
-
-            // Step 2: Delete from payments (linked via bookings)
             authDAO.deletePaymentsByUserId(connection, userId);
-
-            // Step 3: Delete bookings associated with the user
             authDAO.deleteBookingsByUserId(connection, userId);
+            boolean isUserDeleted = authDAO.delete(connection, userId);
 
-            // Step 4: Delete the user
-            boolean isUserDeleted = authDAO.deleteUser(connection, userId);
-
-            // Commit transaction
             connection.commit();
             return isUserDeleted;
         } catch (SQLException e) {
-            // Rollback in case of error
-            if (connection != null) {
-                connection.rollback();
-            }
-            throw e;
-        } finally {
-            // Restore auto-commit and close connection
-            if (connection != null) {
-                connection.setAutoCommit(true);
-                connection.close();
-            }
+            throw new SQLException("Failed to delete user with ID: " + userId, e);
         }
     }
+
 }

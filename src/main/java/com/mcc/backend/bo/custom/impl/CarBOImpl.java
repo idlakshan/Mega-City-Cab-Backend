@@ -19,7 +19,7 @@ public class CarBOImpl implements CarBO {
     private final CarDAO carDAO = new CarDAOImpl();
 
     @Override
-    public void saveCar(CarDTO dto) throws SQLException, ClassNotFoundException {
+    public boolean saveCar(CarDTO dto) throws SQLException, ClassNotFoundException {
         try (Connection conn = VehicleServlet.dataSource.getConnection()) {
             if (carDAO.isCarNumberExists(conn, dto.getCarNumber())) {
                 throw new SQLException("Car number already exists");
@@ -31,7 +31,7 @@ public class CarBOImpl implements CarBO {
             car.setCarNumber(dto.getCarNumber());
             car.setCarImage(dto.getCarImage());
 
-            carDAO.saveCar(conn, car);
+            return carDAO.saveCar(conn, car);
         }
     }
 

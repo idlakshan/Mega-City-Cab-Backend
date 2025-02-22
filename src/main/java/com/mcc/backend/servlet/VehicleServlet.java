@@ -88,9 +88,16 @@ public class VehicleServlet extends HttpServlet {
             dto.setCarImage(imageFileName);
 
             try {
-                carBO.saveCar(dto);
-                JsonObject data = Json.createObjectBuilder().add("carNumber", dto.getCarNumber()).build();
-                ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Car saved successfully", data, null);
+                boolean isSaved = carBO.saveCar(dto);
+
+                if (isSaved) {
+                    JsonObject data = Json.createObjectBuilder()
+                            .add("carNumber", dto.getCarNumber())
+                            .build();
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Car saved successfully", data, null);
+                } else {
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Failed to save car", null, null);
+                }
             } catch (SQLException e) {
                 if (e.getMessage().contains("Car number already exists")) {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_CONFLICT, "Duplicate entry", null, "Car number already exists");

@@ -28,14 +28,14 @@ public class CarDAOImpl implements CarDAO {
     }
 
     @Override
-    public void saveCar(Connection conn, Car car) throws SQLException {
+    public boolean saveCar(Connection conn, Car car) throws SQLException {
         String sql = "INSERT INTO car (category_Id, car_name, car_number, car_image) VALUES (?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, car.getCategoryId());
             pstmt.setString(2, car.getCarName());
             pstmt.setString(3, car.getCarNumber());
             pstmt.setString(4, car.getCarImage());
-            pstmt.executeUpdate();
+            return pstmt.executeUpdate()>0;
         }
     }
 
