@@ -430,7 +430,16 @@ public class BookingServlet extends HttpServlet {
                     bookingBO.updateBookingDriverStatus(booking.getDriverId(), "Available");
 
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Booking status updated to Completed and car/driver status updated to Available.", null, null);
-                } else {
+                }else if ("Canceled".equals(status)){
+                    bookingBO.updateBookingStatus(bookingId, status);
+                    BookingDTO booking = bookingBO.getBookingById(bookingId);
+
+                    bookingBO.updateBookingCarStatus(booking.getCarId(), "Available");
+
+                    bookingBO.updateBookingDriverStatus(booking.getDriverId(), "Available");
+
+                    ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_OK, "Booking status updated to Canceled and car/driver status updated to Available.", null, null);
+                }else {
                     ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid status update.", null, null);
                 }
             } catch (Exception e) {
