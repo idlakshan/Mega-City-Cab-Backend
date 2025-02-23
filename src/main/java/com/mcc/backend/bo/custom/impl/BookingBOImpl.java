@@ -3,6 +3,7 @@ package com.mcc.backend.bo.custom.impl;
 import com.mcc.backend.bo.custom.BookingBO;
 import com.mcc.backend.bo.custom.CarBO;
 import com.mcc.backend.bo.custom.DriverBO;
+import com.mcc.backend.dao.DAOFactory;
 import com.mcc.backend.dao.custom.BookingDAO;
 import com.mcc.backend.dao.custom.impl.BookingDAOImpl;
 import com.mcc.backend.dto.BookingDTO;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 public class BookingBOImpl implements BookingBO {
 
-    private BookingDAO bookingDAO = new BookingDAOImpl();
+    private final BookingDAO bookingDAO = (BookingDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.BOOKING);
 
     @Override
     public int saveBooking(BookingDTO bookingDTO) throws Exception {

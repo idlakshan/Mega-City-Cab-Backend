@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CrudDAO<T, ID> {
+public interface CrudDAO<T, ID> extends SuperDAO {
     T findById(Connection connection, ID id) throws SQLException;
     List<T> findAll(Connection connection) throws SQLException;
     boolean save(Connection connection, T entity) throws SQLException;

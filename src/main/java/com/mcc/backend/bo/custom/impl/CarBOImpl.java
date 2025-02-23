@@ -1,6 +1,7 @@
 package com.mcc.backend.bo.custom.impl;
 
 import com.mcc.backend.bo.custom.CarBO;
+import com.mcc.backend.dao.DAOFactory;
 import com.mcc.backend.dao.custom.CarDAO;
 import com.mcc.backend.dao.custom.impl.CarDAOImpl;
 import com.mcc.backend.dto.CarDTO;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class CarBOImpl implements CarBO {
 
-    private final CarDAO carDAO = new CarDAOImpl();
+    private final CarDAO carDAO = (CarDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.CAR);
 
     @Override
     public boolean saveCar(CarDTO carDTO) throws SQLException, ClassNotFoundException {

@@ -1,6 +1,7 @@
 package com.mcc.backend.bo.custom.impl;
 
 import com.mcc.backend.bo.custom.CategoryBO;
+import com.mcc.backend.dao.DAOFactory;
 import com.mcc.backend.dao.custom.CategoryDAO;
 import com.mcc.backend.dao.custom.impl.CategoryDAOImpl;
 import com.mcc.backend.dto.CategoryDTO;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class CategoryBOImpl implements CategoryBO {
 
-    private final CategoryDAO categoryDAO = new CategoryDAOImpl();
+    private final CategoryDAO categoryDAO = (CategoryDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.CATEGORY);
 
     @Override
     public List<CategoryDTO> getAllCategories() throws SQLException {

@@ -1,6 +1,7 @@
 package com.mcc.backend.bo.custom.impl;
 
 import com.mcc.backend.bo.custom.DriverBO;
+import com.mcc.backend.dao.DAOFactory;
 import com.mcc.backend.dao.custom.DriverDAO;
 import com.mcc.backend.dao.custom.impl.DriverDAOImpl;
 import com.mcc.backend.dto.DriverDTO;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class DriverBOImpl implements DriverBO {
 
-    private final DriverDAO driverDAO = new DriverDAOImpl();
+    private final DriverDAO driverDAO = (DriverDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.DRIVER);
 
     @Override
     public boolean saveDriver(DriverDTO driverDTO) throws SQLException, ClassNotFoundException {

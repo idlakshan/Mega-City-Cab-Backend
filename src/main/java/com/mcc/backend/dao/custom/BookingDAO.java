@@ -1,5 +1,6 @@
 package com.mcc.backend.dao.custom;
 
+import com.mcc.backend.dao.SuperDAO;
 import com.mcc.backend.dto.BookingDTO;
 import com.mcc.backend.entity.Booking;
 
@@ -8,7 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-public interface BookingDAO {
+public interface BookingDAO extends SuperDAO {
     int save(Connection connection, Booking booking) throws Exception;
     List<Booking> getAllBookings(Connection connection) throws Exception;
     List<Booking> getBookingsByUserId(Connection connection, int userId) throws Exception;

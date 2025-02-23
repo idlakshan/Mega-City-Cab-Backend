@@ -2,6 +2,7 @@ package com.mcc.backend.bo.custom.impl;
 
 import com.mcc.backend.bo.custom.AuthBO;
 import com.mcc.backend.config.Security;
+import com.mcc.backend.dao.DAOFactory;
 import com.mcc.backend.dao.custom.AuthDAO;
 import com.mcc.backend.dao.custom.impl.AuthDAOImpl;
 import com.mcc.backend.dto.RoleDTO;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class AuthBOImpl implements AuthBO {
 
-    private final AuthDAO authDAO = new AuthDAOImpl();
+    private final AuthDAO authDAO = (AuthDAO) DAOFactory.getDaoFactory().getDAO(DAOFactory.DAOTypes.AUTH);
 
     @Override
     public String login(String email, String password) throws SQLException {
