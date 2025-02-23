@@ -1,11 +1,12 @@
 package com.mcc.backend.bo.custom;
 
+import com.mcc.backend.bo.SuperBO;
 import com.mcc.backend.dto.CarDTO;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CarBO {
+public interface CarBO extends SuperBO {
    boolean saveCar(CarDTO car) throws SQLException, ClassNotFoundException;
    List<CarDTO> getAllVehicles() throws SQLException, ClassNotFoundException;
    boolean deleteCar(int carId) throws SQLException, ClassNotFoundException;

@@ -1,11 +1,12 @@
 package com.mcc.backend.bo.custom;
 
+import com.mcc.backend.bo.SuperBO;
 import com.mcc.backend.dto.DriverDTO;
 
 import java.sql.SQLException;
 import java.util.List;
 
-public interface DriverBO {
+public interface DriverBO extends SuperBO {
     boolean saveDriver(DriverDTO driver) throws SQLException, ClassNotFoundException;
     List<DriverDTO> getAllDrivers() throws SQLException, ClassNotFoundException;
     DriverDTO getDriverById(int driverId) throws SQLException, ClassNotFoundException;

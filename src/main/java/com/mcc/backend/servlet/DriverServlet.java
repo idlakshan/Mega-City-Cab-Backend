@@ -1,5 +1,6 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.BOFactory;
 import com.mcc.backend.bo.custom.DriverBO;
 import com.mcc.backend.bo.custom.impl.DriverBOImpl;
 import com.mcc.backend.config.Security;
@@ -35,7 +36,7 @@ public class DriverServlet extends HttpServlet {
     @Resource(name = "java:comp/env/db/pool")
     public static DataSource dataSource;
 
-    private final DriverBO driverBO = new DriverBOImpl();
+    private final DriverBO driverBO = (DriverBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DRIVER);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

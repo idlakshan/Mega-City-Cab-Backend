@@ -1,5 +1,6 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.BOFactory;
 import com.mcc.backend.bo.custom.CarBO;
 import com.mcc.backend.bo.custom.DriverBO;
 import com.mcc.backend.bo.custom.impl.CarBOImpl;
@@ -42,10 +43,10 @@ public class StripeCheckoutServlet extends HttpServlet {
     @Resource(name = "java:comp/env/db/pool")
     public static DataSource dataSource;
 
-    private BookingBO bookingBO = new BookingBOImpl();
-    private PaymentBO paymentBO = new PaymentBOImpl();
-    private DriverBO driverBO = new DriverBOImpl();
-    private CarBO carBO = new CarBOImpl();
+    private final CarBO carBO = (CarBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CAR);
+    private final DriverBO driverBO = (DriverBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DRIVER);
+    private final BookingBO bookingBO = (BookingBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.BOOKING);
+    private final PaymentBO paymentBO = (PaymentBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.PAYMENT);
 
     @Override
     public void init() throws ServletException {

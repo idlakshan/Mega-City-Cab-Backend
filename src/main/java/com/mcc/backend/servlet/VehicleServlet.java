@@ -1,5 +1,6 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.BOFactory;
 import com.mcc.backend.bo.custom.CarBO;
 import com.mcc.backend.bo.custom.impl.CarBOImpl;
 import com.mcc.backend.config.Security;
@@ -40,7 +41,7 @@ public class VehicleServlet extends HttpServlet {
     @Resource(name = "java:comp/env/db/pool")
     public static DataSource dataSource;
 
-    private final CarBO carBO = new CarBOImpl();
+    private final CarBO carBO = (CarBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CAR);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

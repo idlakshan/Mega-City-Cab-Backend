@@ -1,12 +1,13 @@
 package com.mcc.backend.bo.custom;
 
+import com.mcc.backend.bo.SuperBO;
 import com.mcc.backend.dto.BookingDTO;
 
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
-public interface BookingBO {
+public interface BookingBO extends SuperBO {
     int saveBooking(BookingDTO bookingDTO) throws Exception;
     List<BookingDTO> getAllBookings() throws Exception;
     List<BookingDTO> getBookingsByUserId(int userId) throws Exception;

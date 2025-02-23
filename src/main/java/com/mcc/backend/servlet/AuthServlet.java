@@ -1,5 +1,6 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.BOFactory;
 import com.mcc.backend.bo.custom.AuthBO;
 import com.mcc.backend.bo.custom.impl.AuthBOImpl;
 import com.mcc.backend.config.Security;
@@ -30,7 +31,7 @@ public class AuthServlet extends HttpServlet {
     @Resource(name = "java:comp/env/db/pool")
     public static DataSource dataSource;
 
-    private final AuthBO authBO = new AuthBOImpl();
+    private final AuthBO authBO = (AuthBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.AUTH);
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

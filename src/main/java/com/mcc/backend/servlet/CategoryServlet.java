@@ -1,5 +1,6 @@
 package com.mcc.backend.servlet;
 
+import com.mcc.backend.bo.BOFactory;
 import com.mcc.backend.bo.custom.CategoryBO;
 import com.mcc.backend.bo.custom.impl.CategoryBOImpl;
 import com.mcc.backend.config.Security;
@@ -26,7 +27,7 @@ public class CategoryServlet extends HttpServlet {
     @Resource(name = "java:comp/env/db/pool")
     public static DataSource dataSource;
 
-    private final CategoryBO categoryBO = new CategoryBOImpl();
+    private final CategoryBO categoryBO = (CategoryBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.CATEGORY);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
