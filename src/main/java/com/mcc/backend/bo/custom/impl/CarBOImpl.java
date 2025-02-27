@@ -7,6 +7,7 @@ import com.mcc.backend.dao.custom.impl.CarDAOImpl;
 import com.mcc.backend.dto.CarDTO;
 import com.mcc.backend.entity.Car;
 import com.mcc.backend.servlet.BookingServlet;
+import com.mcc.backend.servlet.InvoiceServlet;
 import com.mcc.backend.servlet.StripeCheckoutServlet;
 import com.mcc.backend.servlet.VehicleServlet;
 
@@ -124,6 +125,24 @@ public class CarBOImpl implements CarBO {
             car.setCarId(carDTO.getCarId());
             car.setStatus(carDTO.getStatus());
             carDAO.updateCarStatus(connection,car);
+        }
+    }
+
+    @Override
+    public CarDTO getBookedVehicleById(int carId) throws Exception {
+        try (Connection connection = InvoiceServlet.dataSource.getConnection()) {
+            Car car = carDAO.getBookedVehicleById(connection, carId);
+            if (car != null) {
+                CarDTO carDTO = new CarDTO();
+                carDTO.setCarId(car.getCarId());
+                carDTO.setCategoryId(car.getCategoryId());
+                carDTO.setCarName(car.getCarName());
+                carDTO.setCarNumber(car.getCarNumber());
+                carDTO.setCarImage(car.getCarImage());
+                carDTO.setStatus(car.getStatus());
+                return carDTO;
+            }
+            return null;
         }
     }
 }

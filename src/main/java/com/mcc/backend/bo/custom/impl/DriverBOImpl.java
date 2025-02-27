@@ -8,6 +8,7 @@ import com.mcc.backend.dto.DriverDTO;
 import com.mcc.backend.entity.Driver;
 import com.mcc.backend.servlet.BookingServlet;
 import com.mcc.backend.servlet.DriverServlet;
+import com.mcc.backend.servlet.InvoiceServlet;
 import com.mcc.backend.servlet.StripeCheckoutServlet;
 
 import java.sql.Connection;
@@ -134,6 +135,26 @@ public class DriverBOImpl implements DriverBO {
             driver.setDriverId(driverDTO.getDriverId());
             driver.setStatus(driverDTO.getStatus());
             driverDAO.updateDriverStatus(conn,driver);
+        }
+    }
+
+    @Override
+    public DriverDTO getBookedDriverById(int driverId) throws Exception {
+        try (Connection conn = InvoiceServlet.dataSource.getConnection()) {
+            Driver driver = driverDAO.getBookedDriverById(conn, driverId);
+            if (driver != null) {
+                return new DriverDTO(
+                        driver.getDriverId(),
+                        driver.getDriverName(),
+                        driver.getDriverNic(),
+                        driver.getDriverAddress(),
+                        driver.getDriverEmail(),
+                        driver.getLicenseImage(),
+                        driver.getDriverContact(),
+                        driver.getStatus()
+                );
+            }
+            return null;
         }
     }
 }

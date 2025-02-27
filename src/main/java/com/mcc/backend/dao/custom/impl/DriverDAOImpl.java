@@ -142,4 +142,27 @@ public class DriverDAOImpl implements DriverDAO {
             statement.executeUpdate();
         }
     }
+
+    @Override
+    public Driver getBookedDriverById(Connection conn, int id) throws Exception {
+        String sql = "SELECT * FROM driver WHERE driver_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Driver(
+                            rs.getInt("driver_id"),
+                            rs.getString("driver_name"),
+                            rs.getString("driver_nic"),
+                            rs.getString("driver_address"),
+                            rs.getString("driver_email"),
+                            rs.getString("license_image"),
+                            rs.getString("driver_contact"),
+                            rs.getString("status")
+                    );
+                }
+            }
+        }
+        return null;
+    }
 }

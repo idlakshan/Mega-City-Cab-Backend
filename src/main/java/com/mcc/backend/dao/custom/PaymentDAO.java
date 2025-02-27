@@ -9,4 +9,5 @@ import java.util.Map;
 public interface PaymentDAO extends CrudDAO<Payment, Integer> {
     Map<String, Double> getTotalPaymentsLast7Days(Connection conn) throws Exception;
     Map<String, Double> getPaymentHistoryByUserId(Connection conn, int userId) throws Exception;
+    Payment getPaymentByBookingId(Connection conn,int bookingId) throws Exception;
 }

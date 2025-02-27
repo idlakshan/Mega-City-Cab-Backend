@@ -1,95 +1,173 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice</title>
-    <style>
+    <meta charset="UTF-8" />
+    <title>Receipt - Mega City Cabs</title>
+    <style type="text/css">
+        @page {
+            size: A5;
+            margin: 0 30px;
+            padding: 0 10px;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+
         }
-        .invoice-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .invoice-header h1 {
-            color: #333;
-        }
-        .invoice-details, .payment-details {
-            margin-bottom: 20px;
-        }
-        .invoice-details table, .payment-details table {
+
+        .receipt-container {
+            max-width: 420px; /* Fixed width */
             width: 100%;
-            border-collapse: collapse;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            margin: auto;
+            height: 595px;
+
         }
-        .invoice-details th, .payment-details th {
-            background-color: #f2f2f2;
-            padding: 10px;
-            text-align: left;
-        }
-        .invoice-details td, .payment-details td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        .thank-you {
+
+        .receipt-header {
             text-align: center;
-            margin-top: 20px;
-            font-style: italic;
-            color: #555;
+        }
+
+        .logo-circle {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border: 5px solid #ffcc00;
+            border-radius: 30%;
+            margin: 0 auto 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-circle img {
+            width: 57px;
+        }
+
+        .receipt-header h2 {
+            color: #203145;
+            font-size: 22px;
+            margin: 5px 0;
+        }
+
+        .company-details {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .detail-item {
+            overflow: hidden;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #203145;
+        }
+
+        .detail-item span {
+            float: left;
+            width: 50%;
+        }
+
+        .detail-item span:last-child {
+            text-align: right;
+        }
+
+        .divider {
+            border-bottom: 1px dashed #ccc;
+            margin: 12px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 10px;
+        }
+
+        .footer p {
+            margin: 5px 0;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 </head>
 <body>
-<div class="invoice-header">
-    <h1>Invoice</h1>
-</div>
+<div class="receipt-container">
+    <div class="receipt-header">
+        <div class="logo-circle">
+            <img src="https://img.icons8.com/?size=100&amp;id=82579&amp;format=png&amp;color=000000" alt="Mega City Cabs Logo" />
+        </div>
+        <h2>Mega City Cabs</h2>
+        <p class="company-details">
+            No 456 / B, Kings Lane, Bambalapitiya, Sri Lanka <br />
+            +94 77 123 4567 | id.lakshan21@gmail.com <br />
+            www.megacitycabs.lk
+        </p>
+        <p style="color: #555; font-size: 12px; margin-top: 5px;">
+            Receipt #: <strong>${receiptNumber}</strong>
+        </p>
+        <p style="color: #555; font-size: 12px;">
+            Issued on: <strong>${receiptDate} | ${receiptTime}</strong>
+        </p>
+    </div>
 
-<div class="invoice-details">
-    <h2>Booking Details</h2>
-    <table>
-        <tr>
-            <th>Booking ID</th>
-            <td>${bookingId}</td>
-        </tr>
-        <tr>
-            <th>Customer Name</th>
-            <td>${customerName}</td>
-        </tr>
-        <tr>
-            <th>Pickup Location</th>
-            <td>${pickupLocation}</td>
-        </tr>
-        <tr>
-            <th>Drop Location</th>
-            <td>${dropLocation}</td>
-        </tr>
-        <tr>
-            <th>Booking Date</th>
-            <td>${bookingDate}</td>
-        </tr>
-    </table>
-</div>
+    <div class="divider"></div>
+    <div class="detail-item">
+        <span>Booking ID</span>
+        <span>${bookingId}</span>
+    </div>
+    <div class="detail-item">
+        <span>Customer</span>
+        <span>${customerName}</span>
+    </div>
+    <div class="detail-item">
+        <span>Pickup</span>
+        <span>${pickupLocation}</span>
+    </div>
+    <div class="detail-item">
+        <span>Drop</span>
+        <span>${dropLocation}</span>
+    </div>
+    <div class="detail-item">
+        <span>Booking Date</span>
+        <span>${bookingDate}</span>
+    </div>
+    <div class="divider"></div>
+    <div class="detail-item">
+        <span>Driver</span>
+        <span>${driverName}</span>
+    </div>
+    <div class="detail-item">
+        <span>Contact</span>
+        <span>${driverContact}</span>
+    </div>
+    <div class="detail-item">
+        <span>Car</span>
+        <span>${carName} (${carNumber})</span>
+    </div>
+    <div class="divider"></div>
 
-<div class="payment-details">
-    <h2>Payment Details</h2>
-    <table>
-        <tr>
-            <th>Amount</th>
-            <td>${amount}</td>
-        </tr>
-        <tr>
-            <th>Payment Method</th>
-            <td>${paymentMethod}</td>
-        </tr>
-        <tr>
-            <th>Payment Status</th>
-            <td>${paymentStatus}</td>
-        </tr>
-    </table>
-</div>
+    <div class="detail-item">
+        <span>Amount (Incl. 5% tax)</span>
+        <span><strong>${amount}</strong></span>
+    </div>
 
-<div class="thank-you">
-    <p>Thank you for choosing our service!</p>
+    <div class="footer">
+        <p>Thank you for choosing Mega City Cabs!</p>
+        <p>&copy; 2025 Mega City Cabs. All rights reserved.</p>
+    </div>
 </div>
 </body>
 </html>

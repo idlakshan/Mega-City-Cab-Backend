@@ -77,6 +77,7 @@ public class BookingServlet extends HttpServlet {
                             .add("driver", Json.createObjectBuilder()
                                     .add("driverId", assignedDriver.getDriverId())
                                     .add("driverName", assignedDriver.getDriverName())
+                                    .add("driverContact",assignedDriver.getDriverContact())
                                     .add("licenseImage", assignedDriver.getLicenseImage())))
                     .build();
 

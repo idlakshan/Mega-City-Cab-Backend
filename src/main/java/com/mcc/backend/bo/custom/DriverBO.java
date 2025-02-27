@@ -15,4 +15,6 @@ public interface DriverBO extends SuperBO {
     List<DriverDTO> getAvailableDrivers() throws Exception;
     int getActiveDrivers() throws SQLException, ClassNotFoundException;
     void updateDriverStatus(DriverDTO driverDTO) throws Exception;
+    DriverDTO getBookedDriverById(int driverId) throws Exception;
+
 }

@@ -7,6 +7,7 @@ import com.mcc.backend.dao.custom.impl.PaymentDAOImpl;
 import com.mcc.backend.dto.PaymentDTO;
 import com.mcc.backend.entity.Payment;
 import com.mcc.backend.servlet.BookingServlet;
+import com.mcc.backend.servlet.InvoiceServlet;
 import com.mcc.backend.servlet.StripeCheckoutServlet;
 
 import java.sql.Connection;
@@ -44,6 +45,23 @@ public class PaymentBOImpl implements PaymentBO {
     public Map<String, Double> getPaymentHistoryByUserId(int userId) throws Exception {
         try (Connection conn = BookingServlet.dataSource.getConnection()) {
             return paymentDAO.getPaymentHistoryByUserId(conn,userId);
+        }
+    }
+
+    @Override
+    public PaymentDTO getPaymentByBookingId(int bookingId) throws Exception {
+        try (Connection conn = InvoiceServlet.dataSource.getConnection()) {
+            Payment paymentByBooking = paymentDAO.getPaymentByBookingId(conn, bookingId);
+
+            PaymentDTO paymentDTO = new PaymentDTO();
+            paymentDTO.setPaymentId(paymentByBooking.getPaymentId());
+            paymentDTO.setBookingId(paymentByBooking.getBookingId());
+            paymentDTO.setAmount(paymentByBooking.getAmount());
+            paymentDTO.setPaymentMethod(paymentByBooking.getPaymentMethod());
+            paymentDTO.setPaymentStatus(paymentByBooking.getPaymentStatus());
+            paymentDTO.setPaymentDate(paymentByBooking.getPaymentDate());
+
+            return paymentDTO;
         }
     }
 }

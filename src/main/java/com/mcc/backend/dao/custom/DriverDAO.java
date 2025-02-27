@@ -11,4 +11,5 @@ public interface DriverDAO extends CrudDAO<Driver, Integer> {
     List<Driver> getAvailableDrivers(Connection conn) throws Exception;
     int getActiveDrivers(Connection conn) throws SQLException, ClassNotFoundException;
     void updateDriverStatus(Connection conn,Driver driver) throws Exception;
+    Driver getBookedDriverById(Connection conn,int id) throws Exception;
 }

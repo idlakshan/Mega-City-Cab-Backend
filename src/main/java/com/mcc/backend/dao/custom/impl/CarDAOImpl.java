@@ -145,4 +145,26 @@ public class CarDAOImpl implements CarDAO {
             statement.executeUpdate();
         }
     }
+
+    @Override
+    public Car getBookedVehicleById(Connection conn, int id) throws Exception {
+        String query = "SELECT * FROM car WHERE car_id = ?";
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    Car car = new Car();
+                    car.setCarId(resultSet.getInt("car_id"));
+                    car.setCategoryId(resultSet.getInt("category_id"));
+                    car.setCarName(resultSet.getString("car_name"));
+                    car.setCarNumber(resultSet.getString("car_number"));
+                    car.setCarImage(resultSet.getString("car_image"));
+                    car.setStatus(resultSet.getString("status"));
+                    return car;
+                }
+            }
+        }
+        return null;
+    }
+
 }

@@ -15,4 +15,5 @@ public interface CarBO extends SuperBO {
    List<CarDTO> getAvailableVehiclesByCategory(int categoryId) throws Exception;
    int getAvailableVehicles() throws SQLException, ClassNotFoundException;
    void updateCarStatus(CarDTO carDTO) throws Exception;
+   CarDTO getBookedVehicleById (int carId) throws Exception;
 }

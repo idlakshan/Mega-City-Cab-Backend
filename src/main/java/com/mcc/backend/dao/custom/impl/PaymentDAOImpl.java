@@ -81,4 +81,28 @@ public class PaymentDAOImpl implements PaymentDAO {
         }
         return paymentHistory;
     }
+
+    @Override
+    public Payment getPaymentByBookingId(Connection conn, int bookingId) throws Exception {
+        String sql = "SELECT payment_id, booking_id, amount, payment_method, payment_status, payment_date " +
+                "FROM payment WHERE booking_id = ?";
+
+        try (PreparedStatement pstm = conn.prepareStatement(sql)) {
+            pstm.setInt(1, bookingId);
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    Payment payment = new Payment();
+                    payment.setPaymentId(rs.getInt("payment_id"));
+                    payment.setBookingId(rs.getInt("booking_id"));
+                    payment.setAmount(rs.getDouble("amount"));
+                    payment.setPaymentMethod(rs.getString("payment_method"));
+                    payment.setPaymentStatus(rs.getString("payment_status"));
+                    payment.setPaymentDate(rs.getTimestamp("payment_date"));
+                    return payment;
+                }
+            }
+        }
+        return null;
+    }
+
 }
