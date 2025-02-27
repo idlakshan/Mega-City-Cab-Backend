@@ -1,5 +1,6 @@
 package com.mcc.backend.servlet;
 
+
 import com.mcc.backend.bo.BOFactory;
 import com.mcc.backend.bo.custom.BookingBO;
 import com.mcc.backend.bo.custom.CarBO;
@@ -71,6 +72,7 @@ public class BookingServlet extends HttpServlet {
                             .add("car", Json.createObjectBuilder()
                                     .add("carId", assignedCar.getCarId())
                                     .add("carName", assignedCar.getCarName())
+                                    .add("carNumber",assignedCar.getCarNumber())
                                     .add("carImage", assignedCar.getCarImage()))
                             .add("driver", Json.createObjectBuilder()
                                     .add("driverId", assignedDriver.getDriverId())
@@ -172,7 +174,7 @@ public class BookingServlet extends HttpServlet {
             Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
             if (claims != null) {
                 try {
-                  //  System.out.println("works");
+                    //  System.out.println("works");
 
                     int totalBookings = bookingBO.getTotalBookings();
                     int activeDrivers = driverBO.getActiveDrivers();
@@ -335,7 +337,7 @@ public class BookingServlet extends HttpServlet {
 
             try {
                 int userId = (int) claims.getBody().get("userId");
-               // System.out.println("userId "+userId);
+                // System.out.println("userId "+userId);
                 Map<String, Double> paymentHistory = paymentBO.getPaymentHistoryByUserId(userId);
 
                 JsonObjectBuilder paymentHistoryBuilder = Json.createObjectBuilder();

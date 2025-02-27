@@ -40,3 +40,5 @@ build/
 upload/
 
 src/main/resources/config.properties
+
+.qodo

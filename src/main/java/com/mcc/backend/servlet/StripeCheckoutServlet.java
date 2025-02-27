@@ -143,6 +143,7 @@ public class StripeCheckoutServlet extends HttpServlet {
 
             JsonObject responseJson = Json.createObjectBuilder()
                     .add("id", session.getId())
+                    .add("bookingId",bookingId)
                     .build();
 
 
