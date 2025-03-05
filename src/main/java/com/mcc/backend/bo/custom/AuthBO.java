@@ -12,4 +12,5 @@ public interface AuthBO extends SuperBO {
     UserDTO getUserById(int userId) throws SQLException, ClassNotFoundException;
     List<UserDTO> getAllUsers() throws SQLException, ClassNotFoundException;
     boolean deleteUser(int userId) throws SQLException, ClassNotFoundException;
+    boolean updateUser(UserDTO userDTO) throws SQLException, ClassNotFoundException;
 }

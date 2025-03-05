@@ -197,6 +197,53 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = request.getPathInfo();
+
+        if (path.equals("/update-user")) {
+            try {
+                Jws<Claims> claims = Security.isValidJWT(request, response);
+                if (claims == null) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized access. Invalid or missing JWT.");
+                    return;
+                }
+
+                int userId = (int) claims.getBody().get("userId");
+
+                JsonObject jsonObject = parseJson(request.getInputStream());
+                String name = jsonObject.getString("name", null);
+                String email = jsonObject.getString("email", null);
+                String phone = jsonObject.getString("phone", null);
+
+
+                UserDTO userDTO = new UserDTO();
+                userDTO.setId(userId);
+                userDTO.setName(name);
+                userDTO.setEmail(email);
+                userDTO.setPhone(phone);
+
+
+                boolean isUpdated = authBO.updateUser(userDTO);
+
+                if (isUpdated) {
+                    JsonObject responseJson = Json.createObjectBuilder()
+                            .add("status", HttpServletResponse.SC_OK)
+                            .add("message", "User updated successfully!")
+                            .build();
+                    response.setContentType("application/json");
+                    response.getWriter().write(responseJson.toString());
+                } else {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to update user.");
+                }
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error.");
+            }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Endpoint not found");
+        }
+    }
     private JsonObject parseJson(InputStream inputStream) throws IOException {
         try (JsonReader jsonReader = Json.createReader(new InputStreamReader(inputStream, "UTF-8"))) {
             return jsonReader.readObject();

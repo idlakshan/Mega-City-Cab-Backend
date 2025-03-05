@@ -40,8 +40,15 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>3.12.4</version>
+            <artifactId>mockito-inline</artifactId>
+            <version>4.0.0</version> <!-- Use the latest version -->
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version> <!-- or the latest version -->
             <scope>test</scope>
         </dependency>
 

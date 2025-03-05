@@ -150,8 +150,17 @@ public class AuthDAOImpl implements AuthDAO {
     }
 
     @Override
-    public boolean update(Connection connection, User entity) throws SQLException {
-        return false;
+    public boolean update(Connection connection, User user) throws SQLException {
+        String sql = "UPDATE user SET name = ?, email = ?, phone = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getName());
+            statement.setString(2, user.getEmail());
+            statement.setString(3, user.getPhone());
+            statement.setInt(4, user.getId());
+
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        }
     }
 
     @Override

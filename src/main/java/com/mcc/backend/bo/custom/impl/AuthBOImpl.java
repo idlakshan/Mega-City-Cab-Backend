@@ -125,5 +125,28 @@ public class AuthBOImpl implements AuthBO {
             throw new SQLException("Failed to delete user with ID: " + userId, e);
         }
     }
+    @Override
+    public boolean updateUser(UserDTO userDTO) throws SQLException, ClassNotFoundException {
+        try (Connection connection = AuthServlet.dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+
+            User user=new User();
+           user.setId(userDTO.getId());
+           user.setName(userDTO.getName());
+           user.setEmail(userDTO.getEmail());
+           user.setPhone(userDTO.getPhone());
+
+
+            boolean isUpdated = authDAO.update(connection, user);
+
+            if (isUpdated) {
+                connection.commit();
+                return true;
+            } else {
+                connection.rollback();
+                return false;
+            }
+        }
+    }
 
 }
