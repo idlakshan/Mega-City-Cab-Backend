@@ -37,7 +37,6 @@ public class AuthServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo();
 
-
         JsonObject jsonObject = parseJson(request.getInputStream());
 
         if (path.equals("/login")) {
@@ -55,14 +54,15 @@ public class AuthServlet extends HttpServlet {
             } catch (SQLException | ClassNotFoundException e) {
                 throw new ServletException("Login failed", e);
             }
-        } else if (path.equals("/signup")) {
+        }
+
+        else if (path.equals("/signup")) {
             String name = jsonObject.getString("name", null);
             String nic = jsonObject.getString("nic", null);
             String phone = jsonObject.getString("phone", null);
             String email = jsonObject.getString("email", null);
             String password = jsonObject.getString("password", null);
-
-            System.out.println("Signup request - Name: " + name + ", NIC: " + nic + ", Phone: " + phone + ", Email: " + email + ", Password: " + password);
+            //System.out.println("Signup request - Name: " + name + ", NIC: " + nic + ", Phone: " + phone + ", Email: " + email + ", Password: " + password);
 
             UserDTO user = new UserDTO();
             user.setName(name);

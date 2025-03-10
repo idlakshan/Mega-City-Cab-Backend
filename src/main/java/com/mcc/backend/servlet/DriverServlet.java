@@ -41,7 +41,6 @@ public class DriverServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Jws<Claims> claims = Security.isValidAdminJWT(req, resp);
-
         if (claims != null) {
             if (!req.getContentType().startsWith("multipart/form-data")) {
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid request format.", null, "Request must be multipart/form-data.");
@@ -53,13 +52,11 @@ public class DriverServlet extends HttpServlet {
             String driverAddress = req.getParameter("driverAddress");
             String driverEmail = req.getParameter("driverEmail");
             String driverContact = req.getParameter("driverContact");
-
             if (driverName == null || driverName.trim().isEmpty() || driverNic == null || driverNic.trim().isEmpty() ||
                     driverAddress == null || driverAddress.trim().isEmpty() || driverContact == null || driverContact.trim().isEmpty()) {
                 ResponseUtil.sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid input", null, "All fields are required.");
                 return;
             }
-
             Part filePart = req.getPart("licenseImage");
             String licenseImageFileName = null;
 
