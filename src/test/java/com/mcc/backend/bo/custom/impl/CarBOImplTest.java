@@ -89,6 +89,16 @@ public class CarBOImplTest {
     }
 
     @Test
+    public void testGetVehicleById_InvalidId() throws SQLException, ClassNotFoundException {
+        when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+
+        CarDTO carDTO = carBO.getVehicleById(999);
+        assertNull(carDTO);
+    }
+
+    @Test
     public void testGetVehicleById() throws SQLException, ClassNotFoundException {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
         when(preparedStatement.executeQuery()).thenReturn(resultSet);

@@ -45,12 +45,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version> <!-- or the latest version -->
-            <scope>test</scope>
-        </dependency>
 
         <!-- GlassFish JSON Processing API for handling JSON data -->
         <dependency>

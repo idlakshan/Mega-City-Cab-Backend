@@ -36,6 +36,10 @@ public class DriverServlet extends HttpServlet {
     @Resource(name = "java:comp/env/db/pool")
     public static DataSource dataSource;
 
+    public static DataSource getDataSource() {
+        return dataSource;
+    }
+
     private final DriverBO driverBO = (DriverBO) BOFactory.getBoFactory().getBO(BOFactory.BOTypes.DRIVER);
 
     @Override
